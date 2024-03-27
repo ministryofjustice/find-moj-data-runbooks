@@ -101,7 +101,7 @@ Key config settings:
 
 Further configuration options are described on the Tech Docs Template website: [Global Configuration](https://tdt-documentation.london.cloudapps.digital/source/configure_project/global_configuration/).
 
-This repository contains Runbooks for the Analytical Platform.
+This repository contains Runbooks for the Data Catalogue.
 
 ## Preview docs
 
