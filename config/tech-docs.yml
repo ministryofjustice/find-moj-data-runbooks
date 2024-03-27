@@ -34,6 +34,8 @@ show_contribution_banner: true
 github_repo: ministryofjustice/data-catalogue-runbooks
 github_branch: main
 
+default_owner_slack: "#data-catalogue"
+owner_slack_workspace: moj.enterprise
 full_service_name: Data Catalogue Runbooks
 show_expiry: true
 show_review_banner: true
