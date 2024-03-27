@@ -1,0 +1,52 @@
+---
+owner_slack: "#data-catalogue"
+title: Joining Our Team
+last_reviewed_on: 2024-03-27
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+## General Information
+
+- Our team have a stand up each morning at 10:45.
+- We plan our sprints using GitHub Projects.
+- We have our team Retrospective every 2 weeks at the end of each sprint.
+- We have a backlog refinement session halfway through every sprint.
+
+## Tools
+
+### Communication
+
+Our main chat platform is Slack, and this is our preferred method of communication.
+
+We use Slack huddles in the [#data-catalogue channel](https://moj.enterprise.slack.com/archives/C03QZ776JVA)
+for pairing or direct calls.
+
+Developers link PRs in the [#dpl-developers channel](https://moj.enterprise.slack.com/archives/C05AABSKFLJ)
+
+Our agile ceremonies take place in Google Meet,
+making use of Miro boards for collecting feedback from the team,
+or looking at the [team github projects board](https://github.com/orgs/ministryofjustice/projects/57/views/6) for planning.
+
+Our main Slack channels are:
+
+#### #data-catalogue
+
+The [#data-catalogue](https://moj.enterprise.slack.com/archives/C04M8224WCV) channel is our team channel,
+where we have discussions about anything ranging from:
+
+- in-depth technical issues
+- questions or discussions around the service
+- to request someone else from the team's help
+- when we're away for lunch or some other appointment
+- general musings
+
+If you can't make standup, post your standup update here.
+
+### GitHub
+
+Access to Data Catalogue's GitHub repositories and projects is managed in Terraform.
+
+To add a user to a team, add their GitHub username to the data-catalogue team in the
+[`data-catalogue.tf`](https://github.com/ministryofjustice/data-platform/blob/main/terraform/github/data-catalogue.tf) configuration.
