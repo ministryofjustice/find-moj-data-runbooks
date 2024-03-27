@@ -49,7 +49,7 @@ The documentation is created by editing `*.html.md.erb` files, found in the [sou
 
 The syntax is Markdown, more details can be found [here](https://daringfireball.net/projects/markdown/).
 
-For guidance see the Tech Docs Template [Write your content](https://tdt-documentation.london.cloudapps.digital/write_docs/content/).
+For guidance see the Tech Docs Template [Write your content](https://tdt-documentation.london.cloudapps.digital/source/write_docs/content/).
 
 The Markdown syntax may use [kramdown](https://kramdown.gettalong.org/syntax.html) TBC.
 
@@ -99,7 +99,7 @@ Key config settings:
   `/[repo name]`, so if your repository is `ministryofjustice/awesome-docs`
   `service_link` will be `/awesome-docs`
 
-Further configuration options are described on the Tech Docs Template website: [Global Configuration](https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/).
+Further configuration options are described on the Tech Docs Template website: [Global Configuration](https://tdt-documentation.london.cloudapps.digital/source/configure_project/global_configuration/).
 
 This repository contains Runbooks for the Analytical Platform.
 
