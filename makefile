@@ -8,13 +8,13 @@ preview:
 		-v $$(pwd)/config:/app/config \
 		-v $$(pwd)/source:/app/source \
 		-p 4567:4567 \
-		-it $(IMAGE) /scripts/preview.sh
+		-it $(IMAGE) /usr/local/bin/preview
 
 deploy:
 	docker run --rm \
 		-v $$(pwd)/config:/app/config \
 		-v $$(pwd)/source:/app/source \
-		-it $(IMAGE) /scripts/deploy.sh
+		-it $(IMAGE) /usr/local/bin/package
 
 check:
 	docker run --rm \
