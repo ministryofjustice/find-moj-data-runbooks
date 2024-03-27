@@ -4,6 +4,7 @@
     pull_request:
       branches:
         - main
+
   permissions: {}
   jobs:
     build:
@@ -21,6 +22,7 @@
           id: build
           run: |
             /usr/local/bin/package
+
     test:
       name: Test
       runs-on: ubuntu-latest
