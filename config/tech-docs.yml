@@ -4,7 +4,7 @@
 host: https://runbooks.data-catalogue.service.justice.gov.uk
 
 # Header-related options
-show_govuk_logo: true
+show_govuk_logo: false
 service_name: Data Catalogue Runbooks
 service_link: /
 phase: Alpha
