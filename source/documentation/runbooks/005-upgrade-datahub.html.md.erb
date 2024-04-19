@@ -1,0 +1,28 @@
+---
+owner_slack: "#data-catalogue"
+title: Update DataHub version
+last_reviewed_on: 2024-04-19
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+There is no prescribed cadence for updates to DataHub, but new minor versions bumps are typically released every couple of months. 
+Due to the rapid pace of feature development within the platform 
+we aim to be close to the most recent release (without unnecessary exposure to unintended breaking changes).
+
+The upgrade process for DataHub is relatively straightforward as it is handled by a [dedicated upgrade job](https://github.com/acryldata/datahub-helm/tree/master/charts/datahub/templates/datahub-upgrade):
+
+1. Check the [DataHub 'Updating DataHub' page for breaking changes](https://datahubproject.io/docs/how/updating-datahub#breaking-changes)
+1. Check the DataHub helm releases to 
+[check for the latest release that's compatible with the destination version](https://github.com/acryldata/datahub-helm/blame/master/charts/datahub/Chart.yaml#L10)
+1. Check the [DataHub helm release changes from current deployed version to future version](https://github.com/acryldata/datahub-helm/compare/datahub-0.3.30...datahub-0.4.6) 
+for any changes that need to be propagated to the helm chart values files 
+(make sure to set the 'base' and 'compare' to the correct release values in this view)
+1. Submit the upgrade release PR and send an 'alert' message to the [#data-catalogue-dev](https://moj.enterprise.slack.com/archives/C06UQ5HSR25) channel to let others know that DataHub may be disrupted
+1. Deploy to dev and test out the [DataHub interface](https://datahub-catalogue-dev.apps.live.cloud-platform.service.justice.gov.uk/), 
+ensure that [Find MoJ Data dev](https://data-platform-find-moj-data-dev.apps.live.cloud-platform.service.justice.gov.uk/) 
+continues to function ([run a test deployment](https://github.com/ministryofjustice/find-moj-data/actions/workflows/test-and-deploy.yml))
+    1. Make sure to test out multiple pages of Find MoJ Data, as we've found that previously described changes not considered to be breaking have broken our front end.
+1. If there are issues with the upgrade and compatibility with Find MoJ Data, work with the team to determine the best course of action for upgrade, which may involve a temporary rollback.
+1. Once there are no issues with the upgrade, merge the PR and roll out the upgrade to higher environments.
