@@ -9,4 +9,4 @@ review_in: 3 months
 
 The stdout of all of the deployed DataHub pods is stored in [Cloud Platform's ElasticSearch cluster](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#log-collection).
 
-These logs are [searchable via kibana](https://kibana.cloud-platform.service.justice.gov.uk/_plugin/kibana/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(columns:!(kubernetes.namespace_name,kubernetes.container_name,log),filters:!(),index:'167701b0-f8c0-11ec-b95c-1d65c3682287',interval:auto,query:(language:kuery,query:'kubernetes.namespace_name:*datahub*%20AND%20kubernetes.container_name:datahub-gms'),sort:!())).
+These logs are [searchable via kibana](https://kibana.cloud-platform.service.justice.gov.uk/_plugin/kibana/app/discover#/). Try searching for the namespace `*datahub*` and the container name `datahub-gms`, and look at the `log` field.
