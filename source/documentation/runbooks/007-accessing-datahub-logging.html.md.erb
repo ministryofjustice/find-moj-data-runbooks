@@ -1,0 +1,12 @@
+---
+owner_slack: "#data-catalogue"
+title: Accessing DataHub logs
+last_reviewed_on: 2024-05-21
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+The stdout of all of the deployed DataHub pods is stored in [Cloud Platform's ElasticSearch cluster](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#log-collection).
+
+These logs are [searchable via kibana](https://kibana.cloud-platform.service.justice.gov.uk/_plugin/kibana/app/discover#/). Try searching for the namespace `*datahub*` and the container name `datahub-gms`, and look at the `log` field.
