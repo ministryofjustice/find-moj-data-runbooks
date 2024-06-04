@@ -102,15 +102,3 @@ Key config settings:
 Further configuration options are described on the Tech Docs Template website: [Global Configuration](https://github.com/alphagov/tdt-documentation/tree/main/source/configure_project/global_configuration/).
 
 This repository contains Runbooks for the Data Catalogue.
-
-## Preview docs
-
-You can preview how your changes will look, if you've cloned this repository
-to your local machine, run this command:
-
-```bash
-bash scripts/local.sh
-```
-
-This will run a preview web server on <http://localhost:4567> which you can
-open in your browser.
