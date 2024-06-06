@@ -30,8 +30,6 @@ Our users can take advantage of their existing identity to gain access to the Da
 
 ## Consequences
 
-- We will no longer need to use IP range restrictions for the services
-- We will need to exclude the `/metrics` endpoint from authentication, but also secure it from public access
 - We will not have to run an identity service and managing logging and security of that system
 - We will reduce or eliminate our support requirements for:
   - joiners, movers and leavers (JML)
@@ -39,3 +37,5 @@ Our users can take advantage of their existing identity to gain access to the Da
   - name changes (e.g. marriage)
 - Guest accounts are possible, but not managed which means we will need an alternative solution
 - As there is no systematic way to create and manage EntraID groups to provide authorisation, we may need to rely on DataHub roles for this
+- We will no longer need to use IP range restrictions for the services
+- We will need to exclude the `/metrics` endpoint from authentication, but also secure it from public access
