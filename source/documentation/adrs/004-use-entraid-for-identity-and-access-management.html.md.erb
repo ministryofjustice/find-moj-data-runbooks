@@ -1,0 +1,40 @@
+---
+owner_slack: "#data-catalogue"
+title: ADR-004 Use Microsoft EntraID (formally AzureAD) for Identity and Access Management
+last_reviewed_on: 2024-06-06
+review_in: 6 months
+---
+
+# <%= current_page.data.title %>
+
+## Status
+
+✅ Accepted
+
+## Context
+
+The Data Catalogue services will need a way to verify users and provide access to resources.
+We want to simplify access for users by reducing the number of accounts they need.
+
+We do not want to create a custom identity service, or manage a very large number of users with a separate DataHub identity.
+
+We do want users to be identified when interacting with the Find MOJ Data front end.
+
+## Decision
+
+We will use the existing in-house [EntraID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id) (formally Azure Active Directory) service for [Identity and Access Management](https://en.wikipedia.org/wiki/Identity_management) (IDAM), both for DataHub and Find MOJ Data.
+
+Many of our users are already using a `@justice.gov.uk` account as their primary login.
+
+Our users can take advantage of their existing identity to gain access to the Data Catalogue.
+
+## Consequences
+
+- We will not have to run an identity service and managing logging and security of that system
+- We will reduce or eliminate our support requirements for:
+  - joiners, movers and leavers (JML)
+  - issues with multi factor authentication and password resets
+  - name changes (e.g. marriage)
+- As there is no systematic way to create and manage EntraID groups to provide authorisation, we may need to rely on DataHub roles for this
+- We will no longer need to use IP range restrictions for the services
+- We will need to exclude the `/metrics` endpoint from authentication, but also secure it from public access
