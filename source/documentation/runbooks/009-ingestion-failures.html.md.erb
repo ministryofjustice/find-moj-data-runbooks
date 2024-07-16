@@ -1,0 +1,112 @@
+---
+owner_slack: "#data-catalogue"
+title: Ingestion failures
+last_reviewed_on: 2024-07-16
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+This runbook documents failures we have encountered with the ingestion process.
+
+## Recursion errors
+
+If the Datahub ingestion process exceeds python's [recursion limit](https://rollbar.com/blog/python-recursionerror/), it may fail early, with an error like this:
+
+```
+2024-07-03T11:39:41.2461669Z [2024-07-03 11:39:41,181] ERROR    {datahub.ingestion.run.pipeline:491} - Caught error
+2024-07-03T11:39:41.2463027Z Traceback (most recent call last):
+2024-07-03T11:39:41.2465452Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/datahub/sql_parsing/sqlglot_utils.py", line 239, in try_format_query
+2024-07-03T11:39:41.2467355Z     return expression.sql(dialect=dialect, pretty=True)
+2024-07-03T11:39:41.2468362Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2470085Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/expressions.py", line 601, in sql
+2024-07-03T11:39:41.2471674Z     return Dialect.get_or_raise(dialect).generate(self, **opts)
+2024-07-03T11:39:41.2472492Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2475987Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/dialects/dialect.py", line 520, in generate
+2024-07-03T11:39:41.2477701Z     return self.generator(**opts).generate(expression, copy=copy)
+2024-07-03T11:39:41.2478569Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2480275Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 620, in generate
+2024-07-03T11:39:41.2481709Z     sql = self.sql(expression).strip()
+2024-07-03T11:39:41.2482328Z           ^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2483848Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 774, in sql
+2024-07-03T11:39:41.2485246Z     sql = transform(self, expression)
+2024-07-03T11:39:41.2485862Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2487436Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/transforms.py", line 647, in _to_sql
+2024-07-03T11:39:41.2488861Z     return _sql_handler(expression)
+2024-07-03T11:39:41.2489452Z            ^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2491034Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 2324, in select_sql
+2024-07-03T11:39:41.2492855Z     sql = self.prepend_ctes(expression, sql)
+2024-07-03T11:39:41.2493537Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2495176Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 1083, in prepend_ctes
+2024-07-03T11:39:41.2496769Z     with_ = self.sql(expression, "with")
+2024-07-03T11:39:41.2497406Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2498967Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 768, in sql
+2024-07-03T11:39:41.2500482Z     return self.sql(value)
+2024-07-03T11:39:41.2501000Z            ^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2502568Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 774, in sql
+2024-07-03T11:39:41.2503954Z     sql = transform(self, expression)
+2024-07-03T11:39:41.2504549Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2506141Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/transforms.py", line 647, in _to_sql
+2024-07-03T11:39:41.2507542Z     return _sql_handler(expression)
+2024-07-03T11:39:41.2508318Z            ^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.2509887Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 1089, in with_sql
+
+...
+
+2024-07-03T11:39:41.3934553Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 779, in sql
+2024-07-03T11:39:41.3934744Z     sql = getattr(self, exp_handler_name)(expression)
+2024-07-03T11:39:41.3934893Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.3935578Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 3139, in dpipe_sql
+2024-07-03T11:39:41.3935728Z     return self.binary(expression, "||")
+2024-07-03T11:39:41.3935862Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.3936524Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 3271, in binary
+2024-07-03T11:39:41.3936891Z     return f"{self.sql(expression, 'this')} {op} {self.sql(expression, 'expression')}"
+2024-07-03T11:39:41.3937027Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.3937658Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 768, in sql
+2024-07-03T11:39:41.3937792Z     return self.sql(value)
+2024-07-03T11:39:41.3937913Z            ^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.3938542Z   File "/home/runner/work/data-catalogue/data-catalogue/.venv/lib/python3.11/site-packages/sqlglot/generator.py", line 773, in sql
+2024-07-03T11:39:41.3938689Z     if callable(transform):
+2024-07-03T11:39:41.3938807Z        ^^^^^^^^^^^^^^^^^^^
+2024-07-03T11:39:41.3939133Z RecursionError: maximum recursion depth exceeded while calling a Python object
+```
+
+Recursion errors may also be caught and reported at INFO level; for example:
+
+```
+2024-07-03T11:05:37.3320639Z [2024-07-03 11:05:37,331] INFO     {datahub.ingestion.source.dbt.dbt_common:1161} - Failed to parse compiled code for snapshot.mojap_derived_tables.derived_delius_dim__snapshot_sentences_at_disp: maximum recursion depth exceeded
+```
+
+We have seen this happen when calling [sqlglot](https://github.com/tobymao/sqlglot), which formats compiled SQL code we ingest from DBT.
+
+Whether the recursion limit is reached depends on:
+
+- the SQL used in Create a Derived Table (only very long expressions will trigger the issue)
+- the `compiled_code` being output in the DBT manifest (it's possible this depends on the exact DBT command that generated the manifest)
+- the runtime behaviour of Datahub (exactly when the recursion limit is reached depends on the runtime call stack)
+
+This happens because sqlglot parses long expressions into a deeply nested tree; for example, the SQL expression `a || a || a` produces the following abstract syntax tree:
+
+```python
+DPipe(
+    this=DPipe(
+        this=Column(
+            this=Identifier(this=a, quoted=False)
+        ),
+        expression=Column(
+            this=Identifier(this=a, quoted=False)
+        ),
+        safe=True
+    ),
+    expression=Column(
+        this=Identifier(this=a, quoted=False)
+    ),
+    safe=True
+)
+```
+
+[sqlglot's generator class](https://github.com/tobymao/sqlglot/blob/dcc783aad7c2e7184224e90fed7710eb08ddc76a/sqlglot/generator.py#L773) relies on mutually recursive methods to produce SQL strings,
+so if the abstract syntax tree is too deep, it will hit recursion limits.
+
+To mitigate this, we have switched off [`include_compiled_code`](https://github.com/ministryofjustice/data-catalogue/blob/7a7ef7cda8cb7cf351e6c2adbe5132b20d8f79d6/ingestion/cadet.yaml#L36) and `include_column_lineage`
+for the DBT ingestion source.
