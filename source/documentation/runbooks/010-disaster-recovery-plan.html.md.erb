@@ -1,0 +1,136 @@
+---
+owner_slack: "#data-catalogue"
+title: "Disaster recovery plan: Find MoJ data"
+last_reviewed_on: 2024-09-04
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+## Overview
+This runbook provides step-by-step guidance for recovering the 'Find MoJ data' Django application hosted on the Ministry of Justice's internal Cloud Platform (CP) using AWS EKS. 
+It covers the actions required by the Data Catalogue team in the event of a disaster, focusing on minimizing downtime and data loss.
+
+## Summary
+
+- Find MoJ data is a Django application that calls a backend service [DataHub] for all of its data. Both services are hosted on the MoJ's [Cloud Platform] (CP), and use CP for integrated services like the application database ([AWS RDS PostgreSQL]) and search service (AWS OpenSearch).
+
+- Both Find MoJ data and DataHub deployments have RDS PostgreSQL databases deployed via CP and so get [automated daily backups] and the last 7 are retained.
+
+  > **Note**: due to an implementation bug, as of 2024-09-03 the snapshot backups are taken _**every other morning**_, meaning the oldest backup is 12-13 days old, and that the most recent backup can be up to 48 hours old.
+
+- Following loss or corruption of database data, we can restore from one of these backups by [following CP's RDS snapshot restore guidance]. 
+
+  - This process should be tested every 6-12 months to ensure the team is familiar with the process, and that there are no unexpected issues.
+
+  - The Find MoJ data RDS database contains app usage data, which would not be overly detrimental to operation of the service if it were to be lost.
+
+  - The DataHub RDS database contains catalogue metadata aggregated from other data-handling services along with application data (user data, usage data). _(As of 2024-09-03)_ The current aims for our DataHub are to aggregate metadata as-is from data sources, so total loss of this metadata would not result in loss of information for the business, as it could all be re-ingested into the catalogue application.
+
+- The Find MoJ data service is not considered to be a critical service, and as such we have single RDS instances for each of our deployed environments. We do not have multi-Availability Zone (AZ) deployments and/or read replicas for our databases, as the business will be able to tolerate reasonable outages due to aws-level disruptions (e.g. AZ- or region-level outages).
+
+- In the medium term, we do not expect more than 50 simultaneous users for any length of time. At full operation, we could expect to see 1000's of unique monthly users, and at this time we may need to re-visit our recovery objectives.
+
+## Scope
+- **Application**: Django-based Python application
+- **Backend services**: [DataHub] 
+- **Hosting**: MoJ's [Cloud Platform]: AWS EKS
+- **Database**: AWS RDS PostgreSQL
+- **Key Components**:
+  - Django application code
+  - DataHub application
+  - AWS RDS PostgreSQL database
+  - Docker images stored in Amazon ECR
+
+## Recovery Objectives
+- **Recovery Time Objective (RTO)**: 1 day
+- **Recovery Point Objective (RPO)**: 15 hour
+
+## Disaster Scenarios and Responsibilities
+
+### Disruption to hosting services
+The [Cloud Platform team handles recovery for the following scenarios]:
+- Complete Loss of the Platform
+- Loss of the hosting environment namespaces
+- Loss or corruption of platform-level components
+
+### Disruption to DataHub application
+
+### Loss/corruption of application database
+
+### Data Catalogue Team Responsibilities
+
+## Backup Procedures
+
+### Django application
+- **Application code**:
+   - All application code is pushed to the [public GitHub repository].
+
+### Databases
+- **Django database in AWS RDS**:
+    - RDS automated daily snapshots are enabled by default in CP.
+    - Ensure point-in-time recovery is active.
+    - `TODO` Schedule regular manual snapshots and store them in a different AWS region.
+    >**Note** manual snapshots set up this way must also be deleted, as there is an account-level snapshot quota.
+
+### OpenSearch
+- **Snapshots**:
+    - Snapshots are [handled by Cloud Platform as part of OpenSearch deployment](https://github.com/ministryofjustice/cloud-platform-terraform-opensearch)
+
+## Recovery Procedures
+
+### Django application
+<placeholder>
+
+### Microsoft Entra ID integration
+<placeholder>
+
+### Database recovery
+1. **Restore Find MoJ data / DataHub database from RDS snapshots**:
+   - If needed, restore the database to a specific point in time [following CP's RDS snapshot restore guidance].
+1. **Restore OpenSearch index from snapshots in S3**:
+   - Recover OpenSearch indices from the latest snapshots stored in S3 ([AWS instructions])
+   - Verify search functionality is restored in the application.
+   
+### Issues at Cloud Platform level
+1. **Redeploy environments**:
+   - Once Cloud Platform have confirmed that their platform is available, re-deploy affected environment applications 
+   - Trigger GitHub Actions deployments either through manual re-trigger of the latest workflow run, or through merging a PR to `main` and running the relevant deploy pipelines.
+
+## Communication Plan
+- **Internal Communication**:
+  - Notify the Data Catalogue team immediately when a disaster is identified via either of [#data-catalogue] or [#data-catalogue-alerts] Slack channels.
+  - Provide regular updates to stakeholders throughout the recovery process.
+- **External Communication**:
+  - Inform users about any relevant service disruptions via the [#ask-data-catalogue] Slack channel and the [Ask Data Catalogue] Teams channel. Provide updates until full restoration.
+
+## Post-Disaster Review
+1. **Incident Analysis**:
+   - Conduct a post-mortem to identify the root cause of the disaster.
+   - Assess the effectiveness of the recovery process and document lessons learned.
+2. **Plan Update**:
+   - Update the DR plan based on the incident analysis and any new risks identified.
+
+## Documentation and Storage
+1. **DR Plan Storage**:
+   - Store this runbook in a secure, version-controlled repository.
+   - Ensure it is accessible to all key personnel.
+2. **Documentation**:
+   - Maintain up-to-date documentation of application architecture, backup procedures, and recovery steps.
+   - Regularly review and update documentation to reflect any infrastructure or application changes.
+
+
+<!-- links -->
+[Cloud Platform]: https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide
+[AWS RDS PostgreSQL]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/relational-databases/create.html#creating-a-relational-database
+[DataHub]: https://datahubproject.io/docs/features
+[automated daily backups]: https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance?tab=readme-ov-file#input_db_backup_retention_period
+[public GitHub repository]: https://github.com/ministryofjustice/find-moj-data
+[Cloud Platform team handles recovery for the following scenarios]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/cloud-platform-disaster-recovery.html#cloud-platform-disaster-recovery
+[following CP's RDS snapshot restore guidance]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-snapshots.html#restoring-live-services-from-an-rds-db-snapshot
+[#ask-cloud-platform]: https://moj.enterprise.slack.com/archives/C57UPMZLY
+[AWS instructions]: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-restore
+[#data-catalogue]: https://moj.enterprise.slack.com/archives/C03QZ776JVA
+[#data-catalogue-alerts]: https://moj.enterprise.slack.com/archives/C071VNHPUHZ
+[#ask-data-catalogue]: https://moj.enterprise.slack.com/archives/C03QZ776JVA
+[Ask Data Catalogue]: https://teams.microsoft.com/l/channel/19%3Abb91d2a728a54472a41629ee6f2908ea%40thread.tacv2/Ask%20Data%20Catalogue?groupId=f6c3cb3b-591c-4e47-9997-25b6dc9bf5b6&tenantId=c6874728-71e6-41fe-a9e1-2e8c36776ad8
