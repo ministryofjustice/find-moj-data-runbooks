@@ -8,7 +8,7 @@ review_in: 3 months
 # <%= current_page.data.title %>
 
 ## Overview
-This runbook provides step-by-step guidance for recovering the 'Find MoJ data' Django application hosted on the Ministry of Justice's internal Cloud Platform (CP) using AWS EKS. 
+This runbook provides step-by-step guidance for recovering the 'Find MoJ data' Django application hosted on the Ministry of Justice's internal Cloud Platform (CP) using AWS EKS.
 It covers the actions required by the Data Catalogue team in the event of a disaster, focusing on minimizing downtime and data loss.
 
 ## Summary
@@ -19,7 +19,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 
   > **Note**: due to an implementation bug, as of 2024-09-03 the snapshot backups are taken _**every other morning**_, meaning the oldest backup is 12-13 days old, and that the most recent backup can be up to 48 hours old.
 
-- Following loss or corruption of database data, we can restore from one of these backups by [following CP's RDS snapshot restore guidance]. 
+- Following loss or corruption of database data, we can restore from one of these backups by [following CP's RDS snapshot restore guidance].
 
   - This process should be tested every 6-12 months to ensure the team is familiar with the process, and that there are no unexpected issues.
 
@@ -33,7 +33,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 
 ## Scope
 - **Application**: Django-based Python application
-- **Backend services**: [DataHub] 
+- **Backend services**: [DataHub]
 - **Hosting**: MoJ's [Cloud Platform]: AWS EKS
 - **Database**: AWS RDS PostgreSQL
 - **Key Components**:
@@ -91,10 +91,10 @@ The [Cloud Platform team handles recovery for the following scenarios]:
 - **Restore OpenSearch index from snapshots in S3**:
    - Recover OpenSearch indices from the latest snapshots stored in S3 ([AWS instructions])
    - Verify search functionality is restored in the application.
-   
+
 ### Issues at Cloud Platform level
 - **Redeploy environments**:
-   - Once Cloud Platform have confirmed that their platform is available, re-deploy affected environment applications 
+   - Once Cloud Platform have confirmed that their platform is available, re-deploy affected environment applications
    - Trigger GitHub Actions deployments either through manual re-trigger of the latest workflow run, or through merging a PR to `main` and running the relevant deploy pipelines.
 
 ## Communication Plan
@@ -114,7 +114,6 @@ The [Cloud Platform team handles recovery for the following scenarios]:
 ## Documentation and Storage
 - **Documentation**:
    - Regularly review and update documentation to reflect any infrastructure or application changes.
-
 
 <!-- links -->
 [Cloud Platform]: https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide
