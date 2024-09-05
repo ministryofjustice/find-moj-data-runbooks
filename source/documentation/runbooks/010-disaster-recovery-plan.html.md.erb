@@ -33,7 +33,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 
 ## Scope
 - **Application**: Django-based Python application
-- **Backend services**: DataHub 
+- **Backend services**: DataHub
 - **Hosting**: MoJ's Cloud Platform: AWS EKS
 - **Database**: AWS RDS PostgreSQL
 - **Key Components**:
@@ -43,7 +43,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
   - Docker images stored in Amazon ECR
 
 ## Business appetite for time to recovery
-- Our service has not yet reached full deployment within the organisation, and there are no services dependant upon its function. As such, the service could become unresponsive for extended periods without compromising end-user deliver objectives. 
+- Our service has not yet reached full deployment within the organisation, and there are no services dependant upon its function. As such, the service could become unresponsive for extended periods without compromising end-user deliver objectives.
 - We aim to be able to restore all service within 48 hours of disruption.
 
 ## Disaster Scenarios
@@ -70,7 +70,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
     - RDS automated daily snapshots are enabled by default in CP.
     - Ensure point-in-time recovery is active.
     - `TODO` Schedule regular manual snapshots and store them in a different AWS region.
-    
+
     >**Note** manual snapshots set up this way must also be deleted, as there is an account-level snapshot quota.
 - **OpenSearch (DataHub)**:
     - OpenSearch index snapshots are [handled by Cloud Platform as part of OpenSearch deployment]
@@ -108,7 +108,6 @@ It covers the actions required by the Data Catalogue team in the event of a disa
    - Assess the effectiveness of the recovery process and document lessons learned.
 - **Plan Update**:
    - Update the DR plan based on the incident analysis and any new risks identified.
-
 
 <!-- links -->
 [Cloud Platform]: https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide
