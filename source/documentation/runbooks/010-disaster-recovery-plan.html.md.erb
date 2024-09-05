@@ -86,14 +86,14 @@ The [Cloud Platform team handles recovery for the following scenarios]:
 <placeholder>
 
 ### Database recovery
-1. **Restore Find MoJ data / DataHub database from RDS snapshots**:
+- **Restore Find MoJ data / DataHub database from RDS snapshots**:
    - If needed, restore the database to a specific point in time [following CP's RDS snapshot restore guidance].
-1. **Restore OpenSearch index from snapshots in S3**:
+- **Restore OpenSearch index from snapshots in S3**:
    - Recover OpenSearch indices from the latest snapshots stored in S3 ([AWS instructions])
    - Verify search functionality is restored in the application.
    
 ### Issues at Cloud Platform level
-1. **Redeploy environments**:
+- **Redeploy environments**:
    - Once Cloud Platform have confirmed that their platform is available, re-deploy affected environment applications 
    - Trigger GitHub Actions deployments either through manual re-trigger of the latest workflow run, or through merging a PR to `main` and running the relevant deploy pipelines.
 
@@ -105,18 +105,14 @@ The [Cloud Platform team handles recovery for the following scenarios]:
   - Inform users about any relevant service disruptions via the [#ask-data-catalogue] Slack channel and the [Ask Data Catalogue] Teams channel. Provide updates until full restoration.
 
 ## Post-Disaster Review
-1. **Incident Analysis**:
+- **Incident Analysis**:
    - Conduct a post-mortem to identify the root cause of the disaster.
    - Assess the effectiveness of the recovery process and document lessons learned.
-2. **Plan Update**:
+- **Plan Update**:
    - Update the DR plan based on the incident analysis and any new risks identified.
 
 ## Documentation and Storage
-1. **DR Plan Storage**:
-   - Store this runbook in a secure, version-controlled repository.
-   - Ensure it is accessible to all key personnel.
-2. **Documentation**:
-   - Maintain up-to-date documentation of application architecture, backup procedures, and recovery steps.
+- **Documentation**:
    - Regularly review and update documentation to reflect any infrastructure or application changes.
 
 
