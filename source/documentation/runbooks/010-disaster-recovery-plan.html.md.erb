@@ -44,8 +44,8 @@ It covers the actions required by the Data Catalogue team in the event of a disa
   - Docker images stored in Amazon ECR
 
 ## Business appetite for time to recovery
-- Our service has not yet reached full deployment within the organisation, and there are no services dependant upon its function. 
-  As such, our end-users would likely not be overly affected if the service was non-functional for extended periods. 
+- Our service has not yet reached full deployment within the organisation, and there are no services dependant upon its function.
+  As such, our end-users would likely not be overly affected if the service was non-functional for extended periods.
 - We aim to be able to restore all service within 2 working days of disruption.
 
 ## Disaster Scenarios
@@ -81,22 +81,20 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 **Note:** If recovering both Find MoJ Data **and** DataHub, the DataHub instance must be restored and tested for correct operation before attempting to restore Find MoJ Data.
 
 ### Find MoJ Data (Django application)
-The fastest way to recover Find MoJ Data (if there has not been loss of user metadata that needs restoring from database snapshots) is simply to re-deploy it. 
-- First check that the relevant Cloud Platform environments are correctly configured, 
-- re-run the latest run of [the _Staged deploy to Test, Preprod, and Prod_ workflow] to the desired environment. 
+The fastest way to recover Find MoJ Data (if there has not been loss of user metadata that needs restoring from database snapshots) is simply to re-deploy it.
+- First check that the relevant Cloud Platform environments are correctly configured,
+- re-run the latest run of [the _Staged deploy to Test, Preprod, and Prod_ workflow] to the desired environment.
     - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
 
 If the application database (not the backend DataHub metadata database) needs to be restored, see the [Database recovery](#database-recovery) section below.
 
 ### DataHub
-If the DataHub application is taken down with no other changes or loss of function, it can be redeployed similarly to the Find MoJ Data application above: 
-- First check that the relevant Cloud Platform environments are correctly configured, 
-- re-run the latest run of [the _Deploy Staged_ workflow] to the desired environment. 
+If the DataHub application is taken down with no other changes or loss of function, it can be redeployed similarly to the Find MoJ Data application above:
+- First check that the relevant Cloud Platform environments are correctly configured,
+- re-run the latest run of [the _Deploy Staged_ workflow] to the desired environment.
     - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
 
 >**Note:** Whenever the DataHub application is deployed from scratch (where there is no existing deployment), the API tokens that Find MoJ Data uses to communicate with DataHub must be recreated and stored in the secret store for Find MoJ Data {`TODO`: link to guidance on this}.
-
-
 
 ### Microsoft Entra ID integration
 The Azure EntraID tenant is not managed by this team, and any significant outage would cause much wider disruption than just to the Data Catalogue. The only course of action in this event would be to monitor communications on the issue.
