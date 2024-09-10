@@ -18,9 +18,9 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 
   > **Note**: due to an implementation bug, as of 2024-09-03 the snapshot backups are taken _**every other morning**_, meaning the oldest backup is 12-13 days old, and that the most recent backup can be up to 48 hours old.
 
-- Following loss or corruption of database data, we can restore from one of these backups by [following CP's RDS snapshot restore guidance].
+- Following loss or corruption of database data, we can either re-ingest metadata through GitHub Actions workflows, or restore from one of these backups by [following CP's RDS snapshot restore guidance], depending on the scenario.
 
-  - This process should be tested every 6-12 months to ensure the team is familiar with the process, and that there are no unexpected issues.
+  - The process for restoring from snapshot should be tested every 6-12 months to ensure the team is familiar with the process, and that there are no unexpected issues.
 
   - The Find MoJ Data RDS database contains:
     - app usage data, which would not be overly detrimental to operation of the service if it were to be lost
