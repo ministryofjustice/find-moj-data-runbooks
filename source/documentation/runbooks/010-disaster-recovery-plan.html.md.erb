@@ -54,11 +54,12 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 | Disruption to hosting services                                                                                     | High     | Low        | - Following recovery of the platform, we may need to [re-deploy our applications](#issues-at-cloud-platform-level) |
 | AWS Region outage                                                                                                  | High     | Low        | - Wait<br>- This may lead to Disruption to hosting services (above) |
 | Loss of data due to misconfiguration of AWS resources in cloud-platform-environments repo                          | Medium   | Low        | - [Restore database from RDS snapshot](#database-recovery) |
-| Intentional disruption by malicious actor e.g. Distributed Denial of Service (DDoS)                                | High     | Medium     | - [Horizontal auto-scaling] with sensible scaling ceiling<br>- Rate limiting on NGINX ingress<br>- [AWS Shield Standard] (managed DDoS protection service) safeguards applications running on AWS. CP are looking into rolling out [AWS Shield Advanced] for more comprehensive integrated protection |
+| Intentional disruption by malicious actor e.g. Distributed Denial of Service (DDoS)                                | High     | Medium     | - [Horizontal auto-scaling] with sensible scaling ceiling<br>- [`TODO` Rate limiting on NGINX ingress]<br>- [AWS Shield Standard] (managed DDoS protection service) safeguards applications running on AWS. CP are looking into rolling out [AWS Shield Advanced] for more comprehensive integrated protection |
 | Deletion / corruption of application database data                                                                 | Medium   | Low        | - [Restore from snapshot](#database-recovery) |
-| Dependency poisoning attacks                                                                                       | High     | Low        | - Using Dependabot<br>- Scanning on pipeline - NPM audit<br>- Container scanning<br>Dependency assessment criteria<br>Guardduty monitors VPC flow logs for unusual activity |
-| Accidental misconfiguration of code leading to data loss                                                           | High     | Low        | - Manually fix in the DB where possible<br>- DB snapshot	restore |
+| Dependency poisoning attacks                                                                                       | High     | Low        | - Using Dependabot<br>- `TODO:` Trivy scanning on pipeline<br> - `npm audit`<br>- Container scanning (Cloud Platform do this)
+| Accidental misconfiguration of code leading to data loss                                                           | High     | Low        | - Find MoJ Data: write a database migration and roll out via the deploy pipeline. DataHub: use DataHub CLI to repair.<br>- [Restore from snapshot](#database-recovery) |
 | Entra ID disruption (loss of authentication function)                                                              | High     | Low        | - Wait |
+| GitHub Actions disruption / outage (no deployments or ingestions)                                                  | Medium   | Low        | - Wait<br> - ingestions can be triggered from DataHub's UI if they are needed urgently. It is likely that they would be re-triggered once GitHub Actions is restored, so this is not recommended |
 
 ## Backup Procedures
 
@@ -86,15 +87,41 @@ The fastest way to recover Find MoJ Data (if there has not been loss of user met
 - re-run the latest run of [the _Staged deploy to Test, Preprod, and Prod_ workflow] to the desired environment.
     - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
 
+#### Data loss
+_As of 2024-09-03_, any data loss from the Find MoJ data database is acceptable and we could choose not to restore.
+
+If data is not completely lost from Find MoJ data, recovery via a database migration will probably be quicker than a full restore.
+
 If the application database (not the backend DataHub metadata database) needs to be restored, see the [Database recovery](#database-recovery) section below.
 
 ### DataHub
+
+#### Re-deploy
 If the DataHub application is taken down with no other changes or loss of function, it can be redeployed similarly to the Find MoJ Data application above:
 - First check that the relevant Cloud Platform environments are correctly configured,
 - re-run the latest run of [the _Deploy Staged_ workflow] to the desired environment.
     - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
 
 >**Note:** Whenever the DataHub application is deployed from scratch (where there is no existing deployment), the API tokens that Find MoJ Data uses to communicate with DataHub must be recreated and stored in the secret store for Find MoJ Data {`TODO`: link to guidance on this}.
+
+#### Restore content
+There are currently 2 ways to restore content for DataHub if it is lost:
+1. _If no DataHub-specific metadata needs restoring (i.e. DataHub usage stats, user records):_
+    - Re-trigger metadata ingestions. This is likely the simplest solution requiring the least effort from the team. Where this will solve the problem, it should be prefered. Depending on the ingestions needed to be re-run, this may take some time.
+1. Restore all DataHub content to previous state: [restore from an RDS snapshot](#database-recovery)
+
+#### Rollback after disruptive upgrade / deployment
+If DataHub needs restoring due to issues with a DataHub version upgrade, or some issue with changes to the helm deployment instructions, the deployment can be [rolled back via helm]. Use the following commands to identify the previous desired release revision, and roll back to that revision.
+
+```bash
+# get list of historical revisions for a given release, along with release status
+helm history datahub -n [NAMESPACE]
+
+# rollback to desired release revision
+helm rollback datahub [release] -n [NAMESPACE]
+```
+
+**Note:** the datahub` 'release' term comes from the name of the helm chart being deployed in the namespace.
 
 ### Microsoft Entra ID integration
 The Azure EntraID tenant is not managed by this team, and any significant outage would cause much wider disruption than just to the Data Catalogue. The only course of action in this event would be to monitor communications on the issue.
@@ -131,12 +158,13 @@ The more likely scenario - which is in scope for this team - is that the API key
 - **Plan Update**:
    - Update the DR plan based on the incident analysis and any new risks identified.
 
-<!-- links -->
+<!-- external links -->
 [Cloud Platform]: https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide
 [AWS RDS PostgreSQL]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/relational-databases/create.html#creating-a-relational-database
 [DataHub]: https://datahubproject.io/docs/features
 [automated daily backups]: https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance?tab=readme-ov-file#input_db_backup_retention_period
 [following CP's RDS snapshot restore guidance]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-snapshots.html#restoring-live-services-from-an-rds-db-snapshot
+[`TODO` Rate limiting on NGINX ingress]: https://github.com/ministryofjustice/find-moj-data/issues/808
 [AWS Shield Standard]: https://docs.aws.amazon.com/waf/latest/developerguide/ddos-standard-summary.html
 [AWS Shield Advanced]: https://docs.aws.amazon.com/waf/latest/developerguide/ddos-overview.html
 [Horizontal auto-scaling]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/concepts/deploying.html#horizontal-pod-autoscaling-hpa
@@ -146,6 +174,7 @@ The more likely scenario - which is in scope for this team - is that the API key
 [handled by Cloud Platform as part of OpenSearch deployment]: https://github.com/ministryofjustice/cloud-platform-terraform-opensearch
 [the _Staged deploy to Test, Preprod, and Prod_ workflow]: https://github.com/ministryofjustice/find-moj-data/actions/workflows/deploy-staged.yml
 [the _Deploy staged_ workflow]: https://github.com/ministryofjustice/data-catalogue/actions/workflows/deploy-staged.yml
+[rolled back via helm]: https://helm.sh/docs/helm/helm_rollback/
 [#ask-cloud-platform]: https://moj.enterprise.slack.com/archives/C57UPMZLY
 [run a re-index job to recreate the indices from the metadata database]: https://datahubproject.io/docs/how/restore-indices/#kubernetes
 [AWS instructions]: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-restore
