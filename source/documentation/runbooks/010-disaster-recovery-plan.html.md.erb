@@ -1,6 +1,6 @@
 ---
 owner_slack: "#data-catalogue"
-title: "Disaster recovery plan: Find MoJ data"
+title: "Disaster recovery plan: Find MoJ Data"
 last_reviewed_on: 2024-09-04
 review_in: 3 months
 ---
@@ -8,13 +8,13 @@ review_in: 3 months
 # <%= current_page.data.title %>
 
 ## Overview
-This runbook provides step-by-step guidance for recovering the 'Find MoJ data' Django application hosted on the Ministry of Justice's internal Cloud Platform (CP) using AWS EKS.
+This runbook provides step-by-step guidance for recovering the 'Find MoJ Data' Django application hosted on the Ministry of Justice's internal Cloud Platform (CP) using AWS EKS.
 It covers the actions required by the Data Catalogue team in the event of a disaster, focusing on minimizing downtime and data loss.
 
 ## Summary
-- Find MoJ data is a Django application that calls a backend service [DataHub] for all of its data. Both services are hosted on the MoJ's [Cloud Platform] (CP), and use CP for integrated services like the application database ([AWS RDS PostgreSQL]) and search service (AWS OpenSearch).
+- Find MoJ Data is a Django application that calls a backend service [DataHub] for all of its data. Both services are hosted on the MoJ's [Cloud Platform] (CP), and use CP for integrated services like the application database ([AWS RDS PostgreSQL]) and search service (AWS OpenSearch).
 
-- Both Find MoJ data and DataHub deployments have RDS PostgreSQL databases deployed via CP and so get [automated daily backups] and the last 7 are retained.
+- Both Find MoJ Data and DataHub deployments have RDS PostgreSQL databases deployed via CP and so get [automated daily backups] and the last 7 are retained.
 
   > **Note**: due to an implementation bug, as of 2024-09-03 the snapshot backups are taken _**every other morning**_, meaning the oldest backup is 12-13 days old, and that the most recent backup can be up to 48 hours old.
 
@@ -22,13 +22,13 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 
   - This process should be tested every 6-12 months to ensure the team is familiar with the process, and that there are no unexpected issues.
 
-  - The Find MoJ data RDS database contains:
+  - The Find MoJ Data RDS database contains:
     - app usage data, which would not be overly detrimental to operation of the service if it were to be lost
     - survey data, which should be retained where possible
 
   - The DataHub RDS database contains catalogue metadata aggregated from other data-handling services along with application data (user data, usage data). _(As of 2024-09-03)_ The current aims for our DataHub are to aggregate metadata as-is from data sources, so total loss of this metadata would not result in loss of information for the business, as it could all be re-ingested into the catalogue application.
 
-- The Find MoJ data service is not considered to be a critical service, and as such we have single RDS instances for each of our deployed environments. We do not have multi-Availability Zone (AZ) deployments and/or read replicas for our databases, as the business will be able to tolerate reasonable outages due to aws-level disruptions (e.g. AZ- or region-level outages).
+- The Find MoJ Data service is not considered to be a critical service, and as such we have single RDS instances for each of our deployed environments. We do not have multi-Availability Zone (AZ) deployments and/or read replicas for our databases, as the business will be able to tolerate reasonable outages due to aws-level disruptions (e.g. AZ- or region-level outages).
 
 - In the medium term, we do not expect more than 50 simultaneous users for any length of time. At full operation, we could expect to see hundred-to-thousands of unique monthly users, and at this time we may need to re-visit our recovery objectives.
 
@@ -40,7 +40,8 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 - **Key Components**:
   - Django application code
   - DataHub application
-  - AWS RDS PostgreSQL database
+  - [AWS RDS PostgreSQL database]
+  - [AWS Elasticache for Redis]
   - Docker images stored in Amazon ECR
 
 ## Business appetite for time to recovery
@@ -54,8 +55,8 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 | Disruption to hosting services                                                                                     | High     | Low        | - Following recovery of the platform, we may need to [re-deploy our applications](#issues-at-cloud-platform-level) |
 | AWS Region outage                                                                                                  | High     | Low        | - Wait<br>- This may lead to Disruption to hosting services (above) |
 | Loss of data due to misconfiguration of AWS resources in cloud-platform-environments repo                          | Medium   | Low        | - [Restore database from RDS snapshot](#database-recovery) |
-| Intentional disruption by malicious actor e.g. Distributed Denial of Service (DDoS)                                | High     | Medium     | - [Horizontal auto-scaling] with sensible scaling ceiling<br>- [`TODO` Rate limiting on NGINX ingress]<br>- [AWS Shield Standard] (managed DDoS protection service) safeguards applications running on AWS. CP are looking into rolling out [AWS Shield Advanced] for more comprehensive integrated protection |
-| Deletion / corruption of application database data                                                                 | Medium   | Low        | - see [Find MoJ data loss section](#data-loss). Briefly: loss is currently acceptable, can choose not to restore. Prefer restoring by simplest method (migration > re-ingestion > snapshot restore) |
+| Intentional disruption by malicious actor e.g. Distributed Denial of Service (DDoS)                                | High     | Medium     | - [Horizontal auto-scaling] with sensible scaling ceiling<br>- {[`TODO` Rate limiting on NGINX ingress]}<br>- [AWS Shield Standard] (managed DDoS protection service) safeguards applications running on AWS. CP are looking into rolling out [AWS Shield Advanced] for more comprehensive integrated protection |
+| Deletion / corruption of application database data                                                                 | Medium   | Low        | - see [Find MoJ Data loss section](#data-loss). Briefly: loss is currently acceptable, can choose not to restore. Prefer restoring by simplest method (migration > re-ingestion > snapshot restore) |
 | Dependency poisoning attacks                                                                                       | High     | Low        | - Using Dependabot<br>- `TODO:` Trivy scanning on pipeline<br> - `npm audit`<br>- Container scanning (Cloud Platform do this)
 | Accidental misconfiguration of code leading to data loss                                                           | High     | Low        | - Find MoJ Data: write a database migration and roll out via the deploy pipeline. DataHub: use DataHub CLI to repair.<br>- [Restore from snapshot](#database-recovery) |
 | Entra ID disruption (loss of authentication function)                                                              | High     | Low        | - Wait |
@@ -69,7 +70,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
    - Custom metadata ingestions are found in [the data-catalogue repo]
 
 ### Databases
-- **PostgreSQL database in AWS RDS (Find MoJ data, DataHub)**:
+- **PostgreSQL database in AWS RDS (Find MoJ Data, DataHub)**:
     - RDS automated daily snapshots are enabled by default in CP.
     - Ensure point-in-time recovery is active.
     - `TODO` Schedule regular manual snapshots and store them in a different AWS region.
@@ -88,9 +89,9 @@ The fastest way to recover Find MoJ Data (if there has not been loss of user met
     - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
 
 #### Data loss
-_As of 2024-09-03_, any data loss from the Find MoJ data database is acceptable and we could choose not to restore.
+_As of 2024-09-03_, any data loss from the Find MoJ Data database is acceptable and we could choose not to restore.
 
-If data is not completely lost from Find MoJ data, recovery via a database migration will probably be quicker than a full restore.
+If data is not completely lost from Find MoJ Data, recovery via a database migration will probably be quicker than a full restore.
 
 If the application database (not the backend DataHub metadata database) needs to be restored, see the [Database recovery](#database-recovery) section below.
 
@@ -109,6 +110,7 @@ There are currently 2 ways to restore content for DataHub if it is lost:
 1. _If no DataHub-specific metadata needs restoring (i.e. DataHub usage stats, user records):_
     - Re-trigger metadata ingestions. This is likely the simplest solution requiring the least effort from the team. Where this will solve the problem, it should be prefered. Depending on the ingestions needed to be re-run, this may take some time.
 1. Restore all DataHub content to previous state: [restore from an RDS snapshot](#database-recovery)
+    - This will require refreshing any API keys for DataHub for that environment, e.g. used in Find MoJ Data or for local development.
 
 #### Rollback after disruptive upgrade / deployment
 If DataHub needs restoring due to issues with a DataHub version upgrade, or some issue with changes to the helm deployment instructions, the deployment can be [rolled back via helm]. Use the following commands to identify the previous desired release revision, and roll back to that revision.
@@ -126,10 +128,10 @@ helm rollback datahub [release] -n [NAMESPACE]
 ### Microsoft Entra ID integration
 The Azure EntraID tenant is not managed by this team, and any significant outage would cause much wider disruption than just to the Data Catalogue. The only course of action in this event would be to monitor communications on the issue.
 
-The more likely scenario - which is in scope for this team - is that the API keys/secrets which the applications use to communicate with the EntraID tenant expire or are deleted. In this event, follow the {instructions here}
+The more likely scenario - which is in scope for this team - is that the API keys/secrets which the applications use to communicate with the EntraID tenant expire or are deleted. In this event, follow the guidance in the {[`TODO`: secrets management runbook]}.
 
 ### Database recovery
-- **Restore PostgreSQL database from RDS snapshots (Find MoJ data, DataHub)**:
+- **Restore PostgreSQL database from RDS snapshots (Find MoJ Data, DataHub)**:
    - If needed, restore the database to a specific point in time [following CP's RDS snapshot restore guidance].
 - **Restore OpenSearch indices**:
     - **via re-index job**:
@@ -164,6 +166,8 @@ The more likely scenario - which is in scope for this team - is that the API key
 [DataHub]: https://datahubproject.io/docs/features
 [automated daily backups]: https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance?tab=readme-ov-file#input_db_backup_retention_period
 [following CP's RDS snapshot restore guidance]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-snapshots.html#restoring-live-services-from-an-rds-db-snapshot
+[AWS RDS PostgreSQL database]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/relational-databases/create.html
+[AWS Elasticache for Redis]: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/redis/create.html#creating-a-redis-cluster
 [`TODO` Rate limiting on NGINX ingress]: https://github.com/ministryofjustice/find-moj-data/issues/808
 [AWS Shield Standard]: https://docs.aws.amazon.com/waf/latest/developerguide/ddos-standard-summary.html
 [AWS Shield Advanced]: https://docs.aws.amazon.com/waf/latest/developerguide/ddos-overview.html
@@ -176,6 +180,7 @@ The more likely scenario - which is in scope for this team - is that the API key
 [the _Deploy staged_ workflow]: https://github.com/ministryofjustice/data-catalogue/actions/workflows/deploy-staged.yml
 [rolled back via helm]: https://helm.sh/docs/helm/helm_rollback/
 [#ask-cloud-platform]: https://moj.enterprise.slack.com/archives/C57UPMZLY
+[`TODO`: secrets management runbook]: https://github.com/ministryofjustice/find-moj-data-runbooks/issues/44
 [run a re-index job to recreate the indices from the metadata database]: https://datahubproject.io/docs/how/restore-indices/#kubernetes
 [AWS instructions]: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-snapshots.html#managedomains-snapshot-restore
 [#data-catalogue]: https://moj.enterprise.slack.com/archives/C03QZ776JVA
