@@ -1,8 +1,8 @@
 ---
 owner_slack: "#data-catalogue"
 title: ADR-001 Use Cloud Platform for hosting infrastructure
-last_reviewed_on: 2024-02-26
-review_in: 3 months
+last_reviewed_on: 2024-10-01
+review_in: 12 months
 ---
 
 # <%= current_page.data.title %>
@@ -19,8 +19,7 @@ you must use [Cloud Platform](https://user-guide.cloud-platform.service.justice.
 
 ## Decision
 
-We will use the Cloud Platform for hosting our digital services, which will include containerised code, apps and managed storage options (RDS, S3) where appropriate. It is a managed public cloud platform endorsed by
-Justice Digital.
+We will use the Cloud Platform for hosting our services, which will include containerised code, apps and managed storage options (RDS, S3) where appropriate. It is a managed public cloud platform endorsed and supported by Justice Digital.
 
 ## Consequences
 
@@ -31,4 +30,3 @@ As a result of this decision we will benefit from all of the features documented
 - Features such as easy scalability, zero downtime deploys, security scanning, monitoring, logging, and more, all set up by default
 - Configuration is all self-service, using Infrastructure as Code with managed CI/CD and GitOps processes
 - The Cloud Platform team manage the hosting and provide support for the platform
-- We can host [GOV.UK Prototype Kit](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/getting-started/prototype-kit.html) sites quickly and easily
