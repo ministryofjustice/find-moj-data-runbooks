@@ -1,0 +1,19 @@
+---
+owner_slack: "#data-catalogue"
+title: Custom Search Config
+last_reviewed_on: 2024-10-01
+review_in: 3 months
+---
+# <%= current_page.data.title %>
+
+Recent changes to the Datahub search behaviour have highlighted the need for control to ensure we retain the ability to provide an optimal search experience.
+
+We have enabled a custom search [configuration] (https://github.com/ministryofjustice/data-catalogue/blob/af1abd4d2abdf991701682c87a35fc1066489f21/helm_deploy/values-base.yaml#L419) by overriding the base helm values. This provides a way to identify query strings through the use of regex and apply different treatments accordingly.
+
+Search is big subject area and there will no doubt be changes that we would want to make further down the line, the aim of this ticket is to get perspectives within the team around the current behaviour with a view to adding to our configuration over time.
+
+## Documentation
+- [Datahub custom search] (https://datahubproject.io/docs/how/search/#customizing-search)
+- [Elastic search simple query] (https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-simple-query-string-query.html)
+- [Elastic search match phrase prefix query] (https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-match-query-phrase-prefix.html)
+- [Elastic search exact term query] (https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-term-query.html)
