@@ -1,0 +1,81 @@
+---
+owner_slack: "#data-catalogue"
+title: Custom Search Config
+last_reviewed_on: 2024-10-01
+review_in: 3 months
+---
+# <%= current_page.data.title %>
+
+Changes to the Datahub search behaviour have highlighted the need for control to retain the ability to provide an optimal search experience.
+
+
+For example, the 0.14.0.2 release introduced changes that disabled prefix matching for quoted queries and those containing periods and underscores,
+resulting in the failure to return results for partial queries.
+
+```
+prefixMatchQuery: false
+```
+
+```
+- queryRegex: >-
+    ^["'].+["']$|^[a-zA-Z0-9]\S+[_.-]\S+[a-zA-Z0-9]$
+    simpleQuery: false
+    prefixMatchQuery: false
+    exactMatchQuery: true
+    functionScore:
+      functions:
+        - filter:
+            term:
+              deprecated:
+                value: true
+          weight: 0.25
+      score_mode: multiply
+      boost_mode: multiply
+```
+
+We have enabled a custom search [configuration] (https://github.com/ministryofjustice/data-catalogue/blob/af1abd4d2abdf991701682c87a35fc1066489f21/helm_deploy/values-base.yaml#L419) by overriding the base helm values. 
+This provides a way to identify query strings through the use of regex and apply different treatments accordingly.
+
+As a result we have been able to remediate the changes in the 0.14.0.2 release by re-enabling prefix matching,
+and breaking out categorisation of each query as follows.
+
+ ```
+# Criteria for queries containing underscores
+- queryRegex: >-
+    ^[a-zA-Z0-9]\S+[_.-]\S+[a-zA-Z0-9]$
+    simpleQuery: false
+    prefixMatchQuery: true
+    exactMatchQuery: true
+    functionScore:
+    functions:
+        - filter:
+            term:
+            deprecated:
+                value: true
+        weight: 0.25
+    score_mode: multiply
+    boost_mode: multiply
+
+# Criteria for quoted searches
+- queryRegex: >-
+    ^["'].+["']$
+    simpleQuery: false
+    prefixMatchQuery: true
+    exactMatchQuery: true
+    functionScore:
+    functions:
+        - filter:
+            term:
+            deprecated:
+                value: true
+        weight: 0.25
+    score_mode: multiply
+    boost_mode: multiply
+
+```
+
+## Documentation
+- [Datahub custom search] (https://datahubproject.io/docs/how/search/#customizing-search)
+- [Elastic search simple query] (https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-simple-query-string-query.html)
+- [Elastic search match phrase prefix query] (https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-match-query-phrase-prefix.html)
+- [Elastic search exact term query] (https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-term-query.html)
