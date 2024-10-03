@@ -1,20 +1,30 @@
 ---
 title: List of environments
-last_reviewed_on: 2024-03-27
+last_reviewed_on: 2024-10-01
 review_in: 3 months
 ---
 
 # <%= current_page.data.title %>
 
-We have 3 DataHub environments:
+We have 4 environments:
 
-1. Dev (not guaranteed to be stable. Used for testing modifications to deployment)
+1. Dev (not guaranteed to be stable. Used for testing modifications to deployment, or upgrades to DataHub)
 2. Test (relatively stable, will be kept up to date as needed for user testing)
-3. Pre-production ('Preprod', most stable, most out of date)
+3. Pre-production ('Preprod', generally stable, can be used to preview new features to a wider audience)
+4. Production ('prod'). The most stable; user-facing. Only contains builds which have been previewed and tested in preprod.
 
-<div class="govuk-inset-text">
-  <p>At least during alpha, all of these should be populated from the same sources of metadata, so that research participants are working with a catalogue that is as realistic as possible.</p>
-  <p>
-  This means there should be nothing important in our pre-production catalogue that is not also in the dev & test catalogues (including metadata from the production analytical platform).
-  </p>
-</div>
+Each environment instance of Find MoJ Data has a corresponding instance of DataHub.
+
+## Find MoJ Data namespaces
+
+- [Dev](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-find-moj-data-dev)
+- [Test](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-find-moj-data-test)
+- [Preprod](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-find-moj-data-preprod)
+- [Prod](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-find-moj-data-prod)
+
+## DataHub namespaces
+
+- [Dev](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-datahub-catalogue-dev)
+- [Test](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-datahub-catalogue-test)
+- [Preprod](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-datahub-catalogue-preprod)
+- [Prod](https://github.com/ministryofjustice/cloud-platform-environments/tree/main/namespaces/live.cloud-platform.service.justice.gov.uk/data-platform-datahub-catalogue-prod)
