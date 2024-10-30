@@ -1,7 +1,7 @@
 ---
 owner_slack: "#data-catalogue"
 title: Update DataHub version
-last_reviewed_on: 2024-10-08
+last_reviewed_on: 2024-10-30
 review_in: 3 months
 ---
 
@@ -26,3 +26,34 @@ continues to function ([run a test deployment](https://github.com/ministryofjust
     * Make sure to test out multiple pages of Find MoJ Data, as we've found that previously described changes not considered to be breaking have broken our front end.
 1. If there are issues with the upgrade and compatibility with Find MoJ Data, work with the team to determine the best course of action for upgrade, which may involve a temporary rollback.
 1. Once there are no issues with the upgrade, merge the PR and roll out the upgrade to higher environments.
+
+## Troubleshooting
+
+### Another operation in progress
+If helm fails with `Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress`,
+you can run helm locally to rollback Datahub to an earlier revision, and then rerun the job.
+
+To see the revision numbers:
+
+```
+helm history datahub --namespace data-platform-datahub-catalogue-dev
+```
+
+To rollback to a specific revision:
+
+```
+helm rollback datahub $REVISION --namespace data-platform-datahub-catalogue-dev
+```
+
+### Pre-upgrade hooks failed
+
+If you get an error like this
+
+```
+Error: UPGRADE FAILED: release datahub failed, and has been rolled back due to atomic being set: pre-upgrade hooks failed: 1 error occurred:
+	* timed out waiting for the condition
+```
+
+It means one of the jobs that run via pre-upgrade hooks failed. You should be able to see which one was running last from the github actions output. You can then use `k9s` to check the logs for that job.
+
+This error can be caused by a misconfigured ([or missing](https://github.com/datahub-project/datahub/issues/11655)) docker image tag.
