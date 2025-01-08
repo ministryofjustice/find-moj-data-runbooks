@@ -1,0 +1,45 @@
+---
+owner_slack: "#data-catalogue"
+title: Restore search indices
+last_reviewed_on: 2025-01-07
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+Our Datahub deployment stores metadata in two places: PostgreSQL and OpenSearch.
+
+If the two become out of sync, we may see inconsistencies in Datahub and Find MoJ data, for example:
+
+- containers may appear empty, even though they should contain datasets
+- search results may be missing some entities
+- filtering on a tag doesn't bring back everything with that tag
+
+If this happens, [follow these instructions to restore OpenSearch indices](https://datahubproject.io/docs/how/restore-indices/#kubernetes).
+
+Before starting the `datahub-datahub-restore-indices-job-template` cron job, amend the configuration to use the following arguments:
+
+```
+  - -a
+  - batchSize=800
+  - -a
+  - urnBasedPagination=true
+```
+
+This reduces the default `batchSize` to avoid running out of memory on dev and enables `urnBasedPagination` for performance (see [RestoreIndices argument reference](https://github.com/datahub-project/datahub/blob/master/docker/datahub-upgrade/README.md))
+
+
+You can optionally include a `urn` or `urnLike` argument to restrict the reindex to specific entities, e.g.
+
+```
+  - -a
+  - batchSize=800
+  - -a
+  - urnBasedPagination=true
+  - -a
+  - urnLike=urn:li:dataset:(urn:li:dataPlatform:dbt,cadet%
+```
+
+
+## Troubleshooting
+
+- [Datahub v0.14.1 has a bug if URN pagination is enabled](https://github.com/datahub-project/datahub/pull/11443), which prevents the job from terminating. You can monitor the job in k9s and manually kill it when it has completed. This should be fixed in the next release.
