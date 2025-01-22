@@ -1,0 +1,47 @@
+---
+owner_slack: "#data-catalogue"
+title: Metadata field formats and validation
+last_reviewed_on: 2025-01-21
+review_in: 6 months
+---
+# <%= current_page.data.title %>
+
+Metadata can be validated in multiple places:
+
+1. As part of the system the metadata comes from, e.g. dbt, glue
+2. By Datahub and the ingestion sources/transformers
+3. By Find MoJ data itself, before displaying an entry back to the user
+
+Our general strategy for dealing with low quality metadata is to ingest it into Datahub if we can, so it can be reported
+on. However, we do some extra checking in Find MoJ data, and sometimes show users an error instead of showing a page with
+invalid metadata.
+
+The full list of metadata fields used by Find MoJ data is documented in our [Metadata specification](https://find-moj-data.service.justice.gov.uk//metadata_specification).
+
+## Core text fields
+Text fields include the name, description, and the display name (`dc_readable_name`).
+
+Descriptions may contain valid [Markdown](https://daringfireball.net/projects/markdown/syntax).
+
+Other text fields can only contain plain text. Markdown or HTML is not supported.
+
+## Datetime fields
+When we ingest into Datahub we keep track of the last ingested time, and where possible determine the date the data itself was created and last modified
+from the ingestion source. Find MoJ data validates that none of these dates are in the future. 
+
+## Contact information
+- Slack/Teams metadata consists of a URL plus a channel name (e.g. `dc_slack_channel_name`, `dc_slack_channel_url`). This is expected to include the leading '#' (but this is not enforced).
+- Find MoJ data validates email addresses are valid using the Pydantic [EmailStr](https://docs.pydantic.dev/latest/api/networks/#pydantic.networks.EmailStr) type.
+
+## Table schemas
+- Schemas are automatically ingested from the source system so this metadata is not expected to be manually changed.
+- Although Datahub maps platform-specific data types to standardised ones, Find MoJ data will show the type as it is reported by the ingestion source.
+- Column descriptions are expected to be plain text - Markdown is not supported.
+
+## Access information
+`dc_access_requirements` can either be a URL, or plain text. Markdown or HTML is not supported.
+
+The following properties are not yet validated anywhere, but should be set to one of the valid values:
+
+- `dc_where_to_access` is either `AnalyticalPlatform` or blank.
+- `audience` is either `Internal` or `Published`. The default is `Internal`.
