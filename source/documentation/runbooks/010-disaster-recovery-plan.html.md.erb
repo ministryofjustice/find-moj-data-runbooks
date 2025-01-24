@@ -86,7 +86,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 The fastest way to recover Find MoJ data (if there has not been loss of user metadata that needs restoring from database snapshots) is simply to re-deploy it.
 
 - First check that the relevant Cloud Platform environments are correctly configured,
-- re-run the latest run of [the _Staged deploy to Test, Preprod, and Prod_ workflow] to the desired environment.
+- re-run the latest run of [the _Staged deploy to Preprod, and Prod_ workflow] to the desired environment.
     - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
 
 #### Data loss
@@ -178,7 +178,7 @@ The more likely scenario - which is in scope for this team - is that the API key
 [public GitHub repository]: https://github.com/ministryofjustice/find-moj-data
 [the data-catalogue repo]: https://github.com/ministryofjustice/data-catalogue/tree/main/ingestion
 [handled by Cloud Platform as part of OpenSearch deployment]: https://github.com/ministryofjustice/cloud-platform-terraform-opensearch
-[the _Staged deploy to Test, Preprod, and Prod_ workflow]: https://github.com/ministryofjustice/find-moj-data/actions/workflows/deploy-staged.yml
+[the _Staged deploy to Preprod, and Prod_ workflow]: https://github.com/ministryofjustice/find-moj-data/actions/workflows/deploy-staged.yml
 [the _Deploy staged_ workflow]: https://github.com/ministryofjustice/data-catalogue/actions/workflows/deploy-staged.yml
 [rolled back via helm]: https://helm.sh/docs/helm/helm_rollback/
 [#ask-cloud-platform]: https://moj.enterprise.slack.com/archives/C57UPMZLY
