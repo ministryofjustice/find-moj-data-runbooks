@@ -4,4 +4,4 @@
 
 This repository contains runbooks for the Data Catalogue and its front-end app "Find MoJ Data".
 
-[The published runbooks ae hosted here](https://runbooks.find-moj-data.service.justice.gov.uk/)
+[The published runbooks are hosted here](https://runbooks.find-moj-data.service.justice.gov.uk/)
