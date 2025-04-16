@@ -1,6 +1,6 @@
 # Find MoJ Data Runbooks repository
 
-[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/find-moj-data-runbooks/badge)](https://github-community.service.justice.gov.uk/repository-standards/find-moj-data-runbooks)
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/find-moj-data-runbooks/badge)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/repository-standards/find-moj-data-runbooks)
 
 This repository contains runbooks for the Data Catalogue and its front-end app "Find MoJ Data".
 
