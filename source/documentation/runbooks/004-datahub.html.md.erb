@@ -1,18 +1,20 @@
 ---
 owner_slack: "#data-catalogue"
 title: Datahub components
-last_reviewed_on: 2024-10-08
+last_reviewed_on: 2025-04-16
 review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
 
-## Metadata Service (GMS)
+## Metadata service (GMS)
+
 The core of Datahub is its [Metadata Service](https://datahubproject.io/docs/metadata-service/).
 
 This contains a GraphQL API and REST API for querying metadata, and is developed to be agnostic to the metadata model in use.
 
 ## Kafka consumer jobs
+
 We are currently running the Kafka consumer jobs as part of the GMS. They can be split out by passing the `global.datahub_standalone_consumers_enabled` value to the helm chart.
 
 The [Metadata change event consumer](https://datahubproject.io/docs/metadata-jobs/mce-consumer-job) consumes from the `MetadataChangeProposal_v1` Kafka topic.
@@ -22,8 +24,10 @@ The [Metadata audit event consumer](https://datahubproject.io/docs/metadata-jobs
 It responds to changes in the metadata graph (e.g. by updating the search index.)
 
 ## React frontend
+
 The [React frontend](https://datahubproject.io/docs/datahub-web-react) serves Datahub's own UI.
 
 ## Entity registry
+
 The [Entity Registry](https://datahubproject.io/docs/metadata-modeling/metadata-model/) configures the entities, aspects, and relationships that make up the metadata model.
 We use the metadata model that is built into DataHub.
