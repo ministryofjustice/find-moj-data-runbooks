@@ -1,0 +1,49 @@
+---
+owner_slack: "#data-catalogue"
+title: Incident reports
+---
+
+# <%= current_page.data.title %>
+
+## Data loss - 22nd April 2025
+
+On the morning of Tuesday 22nd April 2025, it became apparent there was an issue with the service.
+
+### Timeline
+
+- 09:00 - incident identified
+- 09:14 - incident message posted in #data-catalogue
+- 09:20 - recovery options discussed
+- 09:50 - RDS snapshot restoration commenced:
+  - 10:05 - Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32323) raised and posted in [ask-cloud-platform](https://mojdt.slack.com/archives/C57UPMZLY/p1745312725075239)
+  - 10:27 - after a Concourse, build failure, a subsequent Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32325) raised to remove RDS deletion protection
+  - 11:15 - further Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32332) to add the RDS snapshot ID for restore
+  - 11:35 - service fully restored; service restored message posted in #ask-data-catalogue and #data-catalogue
+  - 12:22 final Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32337) to switch DB protection back on, and remove snapshot ID
+- 2025-04-23 - post-incident review conducted
+
+While the service was most likely down over the long Easter weekend, the service was restored in around 2.5 hours from first becoming aware of the issue.
+
+### Symptoms
+
+- Multiple Sentry alerts: `FIND-MOJ-DATA-D9 - CatalogueError: Unable to execute list domains query`
+- User reporting the issue in #ask-data-catalogue
+- The home page displaying the "there is a problem with the service" page
+- The DataHub home page was displaying the URNs of domains, not their names
+- All DataHub assets were missing (datasets, domains, glossary etc). Note that DataHub still displayed a **count** of datasets
+- DataHub user accounts had been reset to lowest-priviledge defaults
+
+### Cause
+
+### Options considered
+
+- Manual restoration of user accounts
+  - Before it became clear what the problem was, we considered manually updating the DataHub database to restore admin permissions back to our accounts. We discounted this when it became clear that the scope of the problem was wider than data domains and user permissions
+- Restoring an RDS snapshot
+  - Since we were unclear whether it was a problem with ingestion which caused the data loss, and were reasonably sure that the previous Thursdays' snapshot was good, we quickly decided that a restoration of the DataHub database was the quickest route to restoring the service
+
+### Lessons learned
+
+| Lesson   | Action   |
+|----------|----------|
+| We should have posted an ongoing incident message in #ask-data-catalogue | Added clear and simple list of "steps to take" to the top of the disaster recovery runbook |
