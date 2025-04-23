@@ -27,11 +27,11 @@ While the service was most likely down over the long Easter weekend, the service
 ### Symptoms
 
 - Multiple Sentry alerts: `FIND-MOJ-DATA-D9 - CatalogueError: Unable to execute list domains query`
+- DataHub user accounts had been reset to lowest-priviledge defaults (this was when we noticed that 1Password was missing the admin credentials)
 - User reporting the issue in #ask-data-catalogue
 - The home page displaying the "there is a problem with the service" page
 - The DataHub home page was displaying the URNs of domains, not their names
 - All DataHub assets were missing (datasets, domains, glossary etc). Note that DataHub still displayed a **count** of datasets
-- DataHub user accounts had been reset to lowest-priviledge defaults
 
 ### Options considered
 
@@ -42,7 +42,7 @@ While the service was most likely down over the long Easter weekend, the service
 
 ### Cause
 
-Since RDS low storage has been a constant worry for the team, a manaully executed database cleanup script was run on Thursday 17th April ahead of the 4-day Easter weekend. The script has been run several times before by the team, but does require manaully updating before executing.
+Since RDS low storage has been a constant worry for the team, a manually executed database cleanup script was run on Thursday 17th April ahead of the 4-day Easter weekend. The script has been run several times before by the team, but does require manually updating before executing.
 
 It appears that a bug in this script was responsible for removing more data than intended - the intent was to remove only older `dataProcessInstance` records - "log" entries related to removing data. But since DataHub stores everything in one table, any slight bug in the script will have wider consequences, removing more data than was intended.
 
