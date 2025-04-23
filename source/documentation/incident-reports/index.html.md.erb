@@ -20,9 +20,9 @@ On the morning of Tuesday 22nd April 2025, it became apparent there was an issue
   - 11:15 - further Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32332) to add the RDS snapshot ID for restore
 - 11:35 - service fully restored; service restored message posted in #ask-data-catalogue and #data-catalogue
 - 12:22 final Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32337) to switch DB protection back on, and remove snapshot ID
-- 2025-04-23 - post-incident review conducted
+- 2025-04-23 - post-incident review conducted and circulated
 
-While the service was most likely down over the long Easter weekend, the service was restored in around 2.5 hours from first becoming aware of the issue.
+While the service was most likely down over the long Easter weekend, the service was restored in around 2.5 hours from us first becoming aware of the issue.
 
 ### Symptoms
 
@@ -38,11 +38,13 @@ While the service was most likely down over the long Easter weekend, the service
 - Manual restoration of user accounts
   - Before it became clear what the problem was, we considered manually updating the DataHub database to restore admin permissions back to our accounts. We discounted this when it became clear that the scope of the problem was wider than data domains and user permissions
 - Restoring an RDS snapshot
-  - Since we were unclear whether it was a problem with ingestion which caused the data loss, and were reasonably sure that the previous Thursdays' snapshot was good, we quickly decided that a restoration of the DataHub database was the quickest route to restoring the service
+  - Since use role assignments were affected (not just data assets), and were reasonably sure that the previous Thursdays' snapshot was good, we quickly decided that a restoration of the DataHub database was the quickest route to restoring the service
 
 ### Cause
 
-Since RDS low storage has been a constant worry for the team, a manaully executed database cleanup script was run on Thursday 17th April ahead of the 4-day Easter weekend. It appears that a bug in this script was responsible for removing more data than intended - the intent was to remove only older `dataProcessInstance` records - "log" entries related to removing data. But since DataHub stores everything in one table
+Since RDS low storage has been a constant worry for the team, a manaully executed database cleanup script was run on Thursday 17th April ahead of the 4-day Easter weekend. The script has been run several times before by the team, but does require manaully updating before executing.
+
+It appears that a bug in this script was responsible for removing more data than intended - the intent was to remove only older `dataProcessInstance` records - "log" entries related to removing data. But since DataHub stores everything in one table, any slight bug in the script will have wider consequences, removing more data than was intended.
 
 ### Lessons learned
 
@@ -50,11 +52,13 @@ Since RDS low storage has been a constant worry for the team, a manaully execute
 |----------|----------|
 | We should have posted an ongoing incident message in #ask-data-catalogue | Added clear and simple list of "steps to take" to the top of the disaster recovery runbook |
 | We no longer need manual database cleanup | Priortise the ticket to implement DataHub 1.0.0's new native cleanup |
-| RDS restoration could be more efficient | Update our runbooks to set out the steps, rather than just relying on Cloud Platform docs and ask channel |
+| RDS restoration could be more efficient | Update our runbooks to set out steps, rather than just relying on Cloud Platform docs and ask channel |
 | DataHub admin password missing from the team 1Password vault | Admin credentials added to shared vault |
 
 ### Other conclusions
 
-Restoring the serice within 2.5 hours was well within our stated aims, and we have identified improvements to the database restore process which would potentially reduce this to under two hours.
+Restoring the service within 2.5 hours was well within our stated aims, and we have identified improvements to the database restore process which would potentially reduce this to under two hours.
 
-As part of this review, we re-visited our assumption in our disaster recovery guidance that re-ingesting all metadata is still the preferred option over restoring the database (as we did in this case). Given that the ingestion process currently takes around one hour, we still feel that in **most** cases
+As part of this review, we re-visited our assumption in our disaster recovery guidance that re-ingesting all metadata is still the preferred option over restoring the database (as we did in this case). Given that the ingestion process currently takes around **one** hour, we still feel that in **some** cases this is still the correct advice.
+
+In this case, where DataHub user account settings are also affected, an database restore is the best option. The disaster recovery runbook page has been updated to make this distinction.
