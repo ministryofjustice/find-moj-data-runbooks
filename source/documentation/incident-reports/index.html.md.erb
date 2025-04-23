@@ -16,10 +16,10 @@ On the morning of Tuesday 22nd April 2025, it became apparent there was an issue
 - 09:20 - recovery options discussed
 - 09:50 - RDS snapshot restoration commenced:
   - 10:05 - Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32323) raised and posted in [ask-cloud-platform](https://mojdt.slack.com/archives/C57UPMZLY/p1745312725075239)
-  - 10:27 - after a Concourse, build failure, a subsequent Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32325) raised to remove RDS deletion protection
+  - 10:27 - after a Concourse build failure, a subsequent Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32325) raised to remove RDS deletion protection
   - 11:15 - further Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32332) to add the RDS snapshot ID for restore
-  - 11:35 - service fully restored; service restored message posted in #ask-data-catalogue and #data-catalogue
-  - 12:22 final Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32337) to switch DB protection back on, and remove snapshot ID
+- 11:35 - service fully restored; service restored message posted in #ask-data-catalogue and #data-catalogue
+- 12:22 final Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32337) to switch DB protection back on, and remove snapshot ID
 - 2025-04-23 - post-incident review conducted
 
 While the service was most likely down over the long Easter weekend, the service was restored in around 2.5 hours from first becoming aware of the issue.
@@ -33,8 +33,6 @@ While the service was most likely down over the long Easter weekend, the service
 - All DataHub assets were missing (datasets, domains, glossary etc). Note that DataHub still displayed a **count** of datasets
 - DataHub user accounts had been reset to lowest-priviledge defaults
 
-### Cause
-
 ### Options considered
 
 - Manual restoration of user accounts
@@ -42,8 +40,21 @@ While the service was most likely down over the long Easter weekend, the service
 - Restoring an RDS snapshot
   - Since we were unclear whether it was a problem with ingestion which caused the data loss, and were reasonably sure that the previous Thursdays' snapshot was good, we quickly decided that a restoration of the DataHub database was the quickest route to restoring the service
 
+### Cause
+
+Since RDS low storage has been a constant worry for the team, a manaully executed database cleanup script was run on Thursday 17th April ahead of the 4-day Easter weekend. It appears that a bug in this script was responsible for removing more data than intended - the intent was to remove only older `dataProcessInstance` records - "log" entries related to removing data. But since DataHub stores everything in one table
+
 ### Lessons learned
 
 | Lesson   | Action   |
 |----------|----------|
 | We should have posted an ongoing incident message in #ask-data-catalogue | Added clear and simple list of "steps to take" to the top of the disaster recovery runbook |
+| We no longer need manual database cleanup | Priortise the ticket to implement DataHub 1.0.0's new native cleanup |
+| RDS restoration could be more efficient | Update our runbooks to set out the steps, rather than just relying on Cloud Platform docs and ask channel |
+| DataHub admin password missing from the team 1Password vault | Admin credentials added to shared vault |
+
+### Other conclusions
+
+Restoring the serice within 2.5 hours was well within our stated aims, and we have identified improvements to the database restore process which would potentially reduce this to under two hours.
+
+As part of this review, we re-visited our assumption in our disaster recovery guidance that re-ingesting all metadata is still the preferred option over restoring the database (as we did in this case). Given that the ingestion process currently takes around one hour, we still feel that in **most** cases

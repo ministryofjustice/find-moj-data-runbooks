@@ -30,10 +30,7 @@ If an incident which causes data loss is identified, follow these steps:
 - Find MoJ Data is a Django application that calls a backend service [DataHub] for all of its data. Both services are hosted on the MoJ's [Cloud Platform] (CP), and use CP for integrated services like the application database ([AWS RDS PostgreSQL]) and search service (AWS OpenSearch).
 
 - Both Find MoJ Data and DataHub deployments have RDS PostgreSQL databases deployed via CP and so get [automated daily backups] and the last 7 are retained.
-
-  > **Note**: due to an implementation bug, as of 2024-09-03 the snapshot backups are taken _**every other morning**_, meaning the oldest backup is 12-13 days old, and that the most recent backup can be up to 48 hours old.
-
-- Following loss or corruption of database data, we can either re-ingest metadata through GitHub Actions workflows, or restore from one of these backups by [following CP's RDS snapshot restore guidance], depending on the scenario.
+- Following loss or corruption of database data, we can either re-ingest metadata through GitHub Actions workflows, or restore from one of these backups by [d], depending on the scenario.
 
   - The process for restoring from snapshot should be tested every 6-12 months to ensure the team is familiar with the process, and that there are no unexpected issues.
 
@@ -44,7 +41,6 @@ If an incident which causes data loss is identified, follow these steps:
   - The DataHub RDS database contains catalogue metadata aggregated from other data-handling services along with application data (user data, usage data)
 
 - The Find MoJ Data service is not considered to be a critical service, and as such we have single RDS instances for each of our deployed environments. We do not have multi-Availability Zone (AZ) deployments and/or read replicas for our databases, as the business will be able to tolerate reasonable outages due to aws-level disruptions (e.g. AZ- or region-level outages).
-
 
 ## Scope
 
@@ -81,7 +77,7 @@ If an incident which causes data loss is identified, follow these steps:
 
 ## Backup Procedures
 
-### Find MoJ Data (Django application)
+### Find MoJ Data (application and metadata ingestion code)
 
 - **Application code**:
   - All application code is pushed to the [public GitHub repository].
@@ -109,12 +105,6 @@ The fastest way to recover Find MoJ Data (if there has not been loss of user met
 - First check that the relevant Cloud Platform environments are correctly configured,
 - Re-run the latest run of [the _Staged deploy to Preprod, and Prod_ workflow] to the desired environment.
   - If this is not possible, a pull request (PR) merged into main will be required to kick off the workflow. Such a PR can consist of an empty commit.
-
-#### Data loss
-
-If data is not completely lost from Find MoJ Data, recovery via a database migration will probably be quicker than a full restore.
-
-If the application database (not the backend DataHub metadata database) needs to be restored, see the [Database recovery](#database-recovery) section below.
 
 ### DataHub
 
@@ -159,8 +149,15 @@ The more likely scenario - which is in scope for this team - is that the API key
 
 ### Database recovery
 
+In many cases, restoring metadata by re-running the ingestion process will be faster than an RDS restore. At the time of writing, the ingestion takes around one hour to run, and RDS restoration requires PR approval from the Cloud Platform team and could take around two hours.
+
+If **more than just asset metadata is affected** - for example DataHub user account role assignment, or manual glossary entries, then an RDS restore is the better option.
+
 - **Restore PostgreSQL database from RDS snapshots (Find MoJ Data, DataHub)**:
-  - If needed, restore the database to a specific point in time [following CP's RDS snapshot restore guidance].
+  - If needed, restore the database to a specific point in time [following CP's RDS snapshot restore guidance], but also note:
+    - Your first PR should set RDS `deletion_protection` to `false` or the restore will fail - [example](https://github.com/ministryofjustice/cloud-platform-environments/pull/32325/files)
+    - A subsequent PR to specify the snapshot identifier - [example](https://github.com/ministryofjustice/cloud-platform-environments/pull/32332/files)
+    - Once the restore is complete, raise a final PR to set `deletion_protection` to `true` and remove the snapshot identifier - [example](https://github.com/ministryofjustice/cloud-platform-environments/pull/32337/files)
 - **Restore OpenSearch indices**:
   - **via re-index job**:
     - In most scenarios, it will be more straightforward to [run a re-index job to recreate the indices from the metadata database].
@@ -175,7 +172,7 @@ The more likely scenario - which is in scope for this team - is that the API key
   - Once Cloud Platform have confirmed that their platform is available, re-deploy affected environment applications
   - Trigger GitHub Actions deployments either through manual re-trigger of the latest workflow run, or through merging a PR to `main` and running the relevant deploy pipelines.
 
-## Communication Plan
+## Communication plan
 
 - **Internal Communication**:
   - Notify the Data Catalogue team immediately when a disaster is identified via either of [#data-catalogue] or [#data-catalogue-alerts-prod] Slack channels.
