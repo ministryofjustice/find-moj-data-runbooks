@@ -1,7 +1,7 @@
 ---
 owner_slack: "#data-catalogue"
 title: "Disaster recovery plans: Find MoJ Data"
-last_reviewed_on: 2025-04-24
+last_reviewed_on: 2025-04-23
 review_in: 6 months
 ---
 
@@ -10,7 +10,20 @@ review_in: 6 months
 ## Overview
 
 This runbook provides step-by-step guidance for recovering the 'Find MoJ Data' Django application hosted on the Ministry of Justice's internal Cloud Platform (CP) using AWS EKS.
-It covers the actions required by the Data Catalogue team in the event of a disaster, focusing on minimizing downtime and data loss.
+It covers the actions required by the Data Catalogue team in the event of a disaster, focusing on minimising downtime and data loss.
+
+## Steps to take
+
+If an incident which causes data loss is identified, follow these steps:
+
+- Communicate the issue (see the section below)
+- Identify the cause
+- Agree on recovery action(s)
+- Update communications
+- Perform recovery actions
+- Verify that operations are restored
+- Update communications
+- Perform a post-incident review and identify actions (this can be done later)
 
 ## Summary
 
@@ -55,7 +68,7 @@ It covers the actions required by the Data Catalogue team in the event of a disa
 ## Disaster Scenarios
 
 | Disaster | Severity | Likelihood | Recovery/Mitigation |
-|--------------------------------------------------------------------------------------------------------------------|----------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|----------|----------|------------|---------------------|
 | Disruption to hosting services                                                                                     | High     | Low        | - Following recovery of the platform, we may need to [re-deploy our applications](#issues-at-cloud-platform-level) |
 | AWS Region outage                                                                                                  | High     | Low        | - Wait<br />- This may lead to disruption to hosting services (above) |
 | Loss of data due to misconfiguration of AWS resources in cloud-platform-environments repo                          | Medium   | Low        | - [Restore database from RDS snapshot](#database-recovery) |
