@@ -1,21 +1,21 @@
 ---
 owner_slack: "#data-catalogue"
 title: Update DataHub version
-last_reviewed_on: 2024-10-30
+last_reviewed_on: 2025-05-02
 review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
 
 There is no prescribed cadence for updates to DataHub, but new minor versions bumps are typically released every couple of months.
-Due to the rapid pace of feature development within the platform
-we aim to be close to the most recent release (without unnecessary exposure to unintended breaking changes).
+Due to the rapid pace of feature development within the platform we aim to be close to the most recent release 
+(without unnecessary exposure to unintended breaking changes).
 
-The upgrade process for DataHub is relatively straightforward as it is handled by a [dedicated upgrade job](https://github.com/acryldata/datahub-helm/tree/master/charts/datahub/templates/datahub-upgrade):
+The upgrade process for DataHub is relatively straightforward as it is handled by a 
+[dedicated upgrade job](https://github.com/acryldata/datahub-helm/tree/master/charts/datahub/templates/datahub-upgrade):
 
 1. Check the [DataHub 'Updating DataHub' page for breaking changes](https://datahubproject.io/docs/how/updating-datahub#breaking-changes)
-1. Check the DataHub helm releases to
-[check for the latest release that's compatible with the destination version](https://github.com/acryldata/datahub-helm/blame/master/charts/datahub/Chart.yaml#L10)
+1. Check the DataHub Helm releases [check for the latest release that's compatible with the destination version](https://github.com/acryldata/datahub-helm/blame/master/charts/datahub/Chart.yaml#L10)
 1. Check the [DataHub helm release changes from current deployed version to future version](https://github.com/acryldata/datahub-helm/compare/datahub-0.3.30...datahub-0.4.6)
 for any changes that need to be propagated to the helm chart values files
 (make sure to set the 'base' and 'compare' to the correct release values in this view)
@@ -30,18 +30,19 @@ continues to function ([run a test deployment](https://github.com/ministryofjust
 ## Troubleshooting
 
 ### Another operation in progress
+
 If helm fails with `Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress`,
 you can run helm locally to rollback Datahub to an earlier revision, and then rerun the job.
 
 To see the revision numbers:
 
-```
+```sh
 helm history datahub --namespace data-platform-datahub-catalogue-dev
 ```
 
 To rollback to a specific revision:
 
-```
+```sh
 helm rollback datahub $REVISION --namespace data-platform-datahub-catalogue-dev
 ```
 
@@ -49,9 +50,9 @@ helm rollback datahub $REVISION --namespace data-platform-datahub-catalogue-dev
 
 If you get an error like this
 
-```
+```sh
 Error: UPGRADE FAILED: release datahub failed, and has been rolled back due to atomic being set: pre-upgrade hooks failed: 1 error occurred:
-	* timed out waiting for the condition
+  * timed out waiting for the condition
 ```
 
 It means one of the jobs that run via pre-upgrade hooks failed. You should be able to see which one was running last from the github actions output. You can then use `k9s` to check the logs for that job.
