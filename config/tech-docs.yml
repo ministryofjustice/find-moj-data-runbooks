@@ -7,7 +7,7 @@ host: https://runbooks.find-moj-data.service.justice.gov.uk
 show_govuk_logo: false
 service_name: Data Catalogue Runbooks
 service_link: /
-phase: Alpha
+phase: PUBLIC BETA
 
 # Links to show on right-hand-side of header
 header_links:
