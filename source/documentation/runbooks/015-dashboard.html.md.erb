@@ -1,45 +1,41 @@
 ---
 owner_slack: "#data-catalogue"
 title: Metadata dashboard
-last_reviewed_on: 2024-12-11
+last_reviewed_on: 2025-06-19
 review_in: 6 months
 ---
+
 # <%= current_page.data.title %>
 
-The metadata dashboard is used internally within the team to track completeness of the metadata shown in Find MoJ data. It's implemented in [AWS QuickSight](https://docs.aws.amazon.com/quicksight/latest/user/welcome.html).
+The metadata dashboard is a proof-of-concept used to track completeness of the metadata shown in Find MoJ Data. It's implemented in [AWS QuickSight](https://docs.aws.amazon.com/quicksight/latest/user/welcome.html).
 
-To see it, log into the [Analytical Platform Control Panel](https://controlpanel.services.analytical-platform.service.justice.gov.uk/) and
-click on QuickSight.
+The recommended way to access the dashboard is to click the [Metadata dashboard](https://find-moj-data.service.justice.gov.uk/dashboard/) link in the footer of any page within Find MoJ Data.
+
+## View or edit the dashboard via the Analytical Platform
+
+You may have also have access to the dashboard as an Analytical Platform user. Log into the [Analytical Platform Control Panel](https://controlpanel.services.analytical-platform.service.justice.gov.uk/) and click on QuickSight. If you do not see this in the main navigation, click on your username at the top-right of the page and use the self-serve options to grant yuorself access.
 
 Under Dashboards, select "FMD Dashboard v1.4" (or the latest version).
 
-To edit the dashboard, click on "Find MoJ data dashboards" within the Analyses section.
+To edit the dashboard, click on "Find MoJ Data dashboards" within the Analyses section.
 
-## Add a new user
-To grant a new team member access to QuickSight in the Analytical Platform:
-
-1. Log into [EntraID](https://entra.microsoft.com/)
-2. In the groups section, search for `azure-aws-sso-qs-data-catalogue`
-3. Add the new user
-4. Ask the Analytical Platform team (#analytical-platform) to enable the access. They will need to run a script before the QuickSight link becomes available.
-
-To share the dashboard:
+### To share the dashboard
 
 1. Open the dashboard
 2. Click the "Share" icon in the top right
 
-To allow editing:
+### To allow editing
 
 1. Open the analysis
 2. Click on "Share" within the file menu
 
 ## Data connectivity
 
-The dashboard fetches its data from preprod Datahub's RDS database, using the `quicksight` user.
+The dashboard fetches its data from preprod DataHub's RDS database, using the `quicksight` user.
 
 Quicksight is part of the `platforms-production` VPC, which can resolve Cloud Platform internal hostnames.
 
-Credentials for the `quicksight` user can be found in the "Datahub" 1Password vault.
+Credentials for the `quicksight` user can be found in the "DataHub" 1Password vault.
 
 If you need to recreate the credentials, [connect to the database](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html) and run the following,
 replacing `<password>` with a randomly generated password:
