@@ -38,7 +38,7 @@ show_contribution_banner: true
 github_repo: ministryofjustice/find-moj-data-runbooks
 github_branch: main
 
-default_owner_slack: "#data-catalogue"
+default_owner_slack: "#find-moj-data"
 owner_slack_workspace: moj.enterprise
 full_service_name: Data Catalogue Runbooks
 show_expiry: true
