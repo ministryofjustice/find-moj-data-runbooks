@@ -1,0 +1,46 @@
+---
+owner_slack: "#data-catalogue"
+title: ADR-007 We will use Pythom + Django + PostgresSQL for front-end development
+last_reviewed_on: 2025-07-16
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Given the decision to layer our own interface over DataHub, this ADR is concerned with the choice of development stack for that application.
+
+## Analysis
+
+There are a number of tech stacks in use in Justice Digital, including:
+
+* Ruby / Ruby on Rails
+* PHP
+* Python
+* .NET
+
+Should the front-end application require its own data store, the following database management systems are available:
+
+* Oracle
+* PostgreSQL
+* MS SQL Server
+
+Python is a well supported language within Justice Digital, and a common language for those involved with data. Python is the language used by DataHub.
+
+Django is a popular, well documented development framework for Python web applications with good community support and regular updates.
+
+PostgreSQL is much lower cost than the alternatives and has first-class support within our Cloud Platform.
+
+## Decision
+
+We will use Python as the development language, Django as the web application framework, and PostgreSQL as a data store.
+
+## Consequences
+
+* The Data Catalogue team will need to ensure that the appropriate skills are in place to maintain the application
+* The team will need to ensure database resources are appropriately provisioned, and that backup and disaster reocvery processes are in place

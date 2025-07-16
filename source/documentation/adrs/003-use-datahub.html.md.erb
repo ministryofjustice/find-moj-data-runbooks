@@ -1,6 +1,6 @@
 ---
 owner_slack: "#data-catalogue"
-title: ADR-004 We will use DataHub as our catalogue back-end
+title: ADR-003 We will use DataHub as our catalogue back-end
 last_reviewed_on: 2025-07-16
 review_in: 12 months
 ---
@@ -19,7 +19,34 @@ During discovery, a number of catalogue products were evaluated, and we also con
 
 Details of our analysis and selection process can be found in the data catalogue Technical Design Authority submission (OFFICIAL-SENSITIVE - for internal use only).
 
-### Selection criteria
+### Build - advantages
+
+* Complete control over the metadata model
+* Complete control over feature development priorities
+* Tighter integration with our front end [Find MoJ Data](006-own-front-end.html)
+* Potenitally simpler infrastucture setup
+  
+### Build - disadvantages
+
+* Larger team / higher cost (or slower lead times)
+* A longer lead-time to going live
+* A higher level of testing and QA required
+* Counter to a core principle (see below)
+
+### Buy - advantages
+
+* A rich set of tested features immediately available
+* The product benefits from the expertise of many other data catalogue experts (not just our own views)
+* Brand recogntion and trust in the product
+
+### Buy - disadvantages
+
+* Requires deep understanding of a third-party application
+* A feature may not be available
+* The metadata model may not be a perfect fit for our requirements
+* Dependent on others for documentation, patches and fixes (using an open sourxe product mitigates this to a degree)
+
+### Buy - election criteria
 
 * Feature alignment with our business needs
 * Cost
@@ -31,36 +58,11 @@ Details of our analysis and selection process can be found in the data catalogue
 * Search capabilities
 * Documentation and community support
 
-### Build - advantages
-
-* Complete control over the metadata model
-* Complete control over feature development priorities
-* Tighter integration with our front end [Find MoJ Data](006-own-front-end.html)
-* Potenitally simpler infrastucture setup
-  
-### Build - disadvantages
-
-* A longer lead-time to going live
-* Larger team / higher cost (or slower lead times)
-* A higher level of testing and QA required
-
-### Buy - advantages
-
-* A rich set of tested features immediately available
-* The product benefits from the expertise of many other data cataloge experts (not just our own views)
-* Brand recogntion and trust in the product
-
-### Buy - disadvantages
-
-* Requires deep understanding of a third-party application
-* A feature may not be available
-* Dependent on others for documentation, patches and fixes (using an open sourxe product mitigates this to a degree)
-
 ## Decision
 
-A core principle of Justice Digital is *"reuse before buy, buy before build"*. Since there was no existing project to re-use, we opted **not** to build our own catalogue back-end. Our eventual selection was [DataHub](https://datahub.com/), an open-source product.
+A core principle of government digital is *"reuse before buy, buy before build"*. Since there was no existing project to re-use, we opted **not** to build our own catalogue back-end. Our eventual selection was [DataHub](https://datahub.com/), an open-source product.
 
-DataHub offers a rich set of functionality which would have to be re-created:
+DataHub offers a rich set of functionality which would have to be re-created if we had opted to build from scratch:
 
 * A mature metadata model, which also supports custom key/value pairs to extend asset attributes
 * A library of pre-built ingestion routines (notably for dbt and PostgreSQL)

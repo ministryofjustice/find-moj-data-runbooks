@@ -1,0 +1,69 @@
+---
+owner_slack: "#data-catalogue"
+title: ADR-006 We will create our own front-end (user interface)
+last_reviewed_on: 2025-07-16
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+## Status
+
+✅ Accepted
+
+## Context
+
+This ADR is concerned with the choice of how we present our catalogue to our users.
+
+## Analysis
+
+There are two options:
+
+* We roll out DataHub's default interface to users
+* We utilise the DataHub API to create our own front-end
+
+Both approaches have advantages and disadvantages:
+
+### Use DataHub's default interface
+
+#### Advantages
+
+* No additional development required
+
+#### Disadvantages
+
+* The DataHub UI was proven through user research to be overwhelmingly complicated for some users
+* The DataHub UI fails on a number of accessibility criteria
+* The DataHub UI exposes *all* functionality, whether it is currently in use or not, and whether our data improvement programme and overall data maturity is ready for a feature
+
+### Create our own front-end (user interface)
+
+#### Advantages
+
+* We can leverage the GOV.UK design system to present a trusted, familiar interface
+* We can create our own identity (brand)
+* We have control over accessibility
+* We can expose features as and when users and the organisation is ready
+* We can make our code open so that other departments can re-use it
+
+#### Disadvantages
+
+* Greater development resource required
+
+## Decision
+
+Given the disadvantages of the DataHub UI and the advantages of a GOV.UK interface, the decsion is to create our own front end.
+
+## Consequences
+
+The Data Catalogue team will need to:
+
+* Understand the development stack, including the Design System
+* Be aware of how to develop accessible features
+* Create and maintain Cloud Platform environments for the front-end application
+* Integrate Entra ID into the application
+* Deploy the application
+* Secure the application
+* Monitor performance
+* Check for and apply patches and other updates
+* Test new features in a realistic non-production environments
