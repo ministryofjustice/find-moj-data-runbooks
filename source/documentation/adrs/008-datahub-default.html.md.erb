@@ -1,0 +1,32 @@
+---
+owner_slack: "#find-moj-data"
+title: ADR-008 Do not customise DataHub's code
+last_reviewed_on: 2025-07-16
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Since DataHub is open source, and we host it ourselves, we have the ability to make changes to its functionality by altering its code.
+
+We also have the ability to configure DataHub (via settings / configuration files) with the constraints of what DataHub offers.
+
+## Analysis
+
+### Advantages
+
+* We can tailor DataHub to meet specific organisational requirements
+
+### Disdvantages
+
+* Changes to code will make deploying future upgrades much more difficult, creating a barrier to deploying patches and new features
+
+## Decision
+
+We will **not** alter DataHub's code, and instead limit any customisation to what can be achieved through standard configuration.

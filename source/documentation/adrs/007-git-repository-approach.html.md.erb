@@ -1,7 +1,7 @@
 ---
-owner_slack: "#data-catalogue"
-title: ADR-003 Use single GitHub repositry for Find MOJ data
-last_reviewed_on: 2024-12-11
+owner_slack: "#find-moj-data"
+title: ADR-007 Use single GitHub repositry for Find MOJ data
+last_reviewed_on: 2025-07-16
 review_in: 12 months
 ---
 
@@ -13,11 +13,10 @@ review_in: 12 months
 
 ## Context
 
-There was a discussion around what is the best git repo stategy to accomodate the following:
+There was a discussion around what is the best Git repository stategy to accomodate the following:
 
 - Find MOJ Data App
-- Python Datahub library
-- Data registration API (still being discussed)
+- Python DataHub library
 
  [This diagram](../../images/repo-strategy-workflow.excalidraw.png) highlights the differences between using one repo per component or a single repo for all
 
@@ -26,5 +25,5 @@ There was a discussion around what is the best git repo stategy to accomodate th
 The following was agreed:
 
 - Use a mono repo approach for the components above.
-- The App and possible APIs should import the python library via relative path.
+- The app and possible APIs should import the python library via relative path.
 - The library will still be packaged and uploaded to PYPI to allow external users

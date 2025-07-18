@@ -1,0 +1,86 @@
+---
+owner_slack: "#find-moj-data"
+title: ADR-003 We will use DataHub as our catalogue back-end
+last_reviewed_on: 2025-07-16
+review_in: 12 months
+---
+
+# <%= current_page.data.title %>
+
+## Status
+
+✅ Accepted
+
+## Context
+
+During discovery, a number of catalogue products were evaluated, and we also considered the "build vs. buy" option. ("Buy" also includes using free, open-source products).
+
+## Analysis
+
+Details of our analysis and selection process can be found in the data catalogue Technical Design Authority submission (OFFICIAL-SENSITIVE - for internal use only).
+
+### Build - advantages
+
+* Complete control over the metadata model
+* Complete control over feature development priorities
+* Tighter integration with our front end [Find MoJ Data](006-own-front-end.html)
+* Potenitally simpler infrastucture setup
+  
+### Build - disadvantages
+
+* Larger team / higher cost (or slower lead times)
+* A longer lead-time to going live
+* A higher level of testing and QA required
+* Counter to a core principle (see below)
+
+### Buy - advantages
+
+* A rich set of tested features immediately available
+* The product benefits from the expertise of many other data catalogue experts (not just our own views)
+* Brand recogntion and trust in the product
+
+### Buy - disadvantages
+
+* Requires deep understanding of a third-party application
+* A feature may not be available
+* The metadata model may not be a perfect fit for our requirements
+* Dependent on others for documentation, patches and fixes (using an open sourxe product mitigates this to a degree)
+
+### Buy - election criteria
+
+* Feature alignment with our business needs
+* Cost
+* Ease of deployment
+* Ease of integration with existing systems to ingest metadata (how easy is it to get data in - and back out again to avoid lock-in)
+* Types of metadata ingestions supported
+* Extensibility and flexibility (e.g. APIs and configuration, UI customisation, custom ingestion)
+* SSO integration
+* Search capabilities
+* Documentation and community support
+
+## Decision
+
+A core principle of government digital is *"reuse before buy, buy before build"*. Since there was no existing project to re-use, we opted **not** to build our own catalogue back-end. Our eventual selection was [DataHub](https://datahub.com/), an open-source product.
+
+DataHub offers a rich set of functionality which would have to be re-created if we had opted to build from scratch:
+
+* A mature metadata model, which also supports custom key/value pairs to extend asset attributes
+* A library of pre-built ingestion routines (notably for dbt and PostgreSQL)
+* Indexing and searching
+* A rich API
+* EntraID SSO
+* Support for data domains, platforms and tagging of assets
+* Data lineage
+* A glossary feature, which allows linking data assets to glossary terms
+* Support for data quality assertions
+* A UI for advanced operations and configuration
+* Out-of-the-box deployment configurations available for [in-house hosting](005-datahub-self-hosted.html)
+
+## Consequences
+
+The Data Catalogue team will need to:
+
+* Be aware of, and use, DataHub community support resources
+* Monitor for DataHub updates
+* Evaluate how DataHub features align with our specific needs
+* Evaluate how to handle feature requests which are not supported by DataHub
