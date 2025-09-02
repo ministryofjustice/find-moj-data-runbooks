@@ -72,7 +72,7 @@ In short:
 
 DBT turns raw data into clean, tested, documented datasets ready for analytics — all using SQL, version control, and modern software engineering practices.
 
-## Approach
+### Approach
 For the POC we decided to implement three main tests:
 
 ### Column Completeness
@@ -414,3 +414,28 @@ The generated quality metrics are then displayed in the front end application wh
 - [DBT Tests Documentation](https://docs.getdbt.com/docs/building-a-dbt-project/tests)
 - [CaDet Repository](https://github.com/moj-analytical-services/create-a-derived-table/tree/main)
 - [Cadet Catalogue](https://derived-table-docs.analytical-platform.service.justice.gov.uk/#!/overview)
+
+
+## Approach for obtaining data quality metrics across wider CaDeT models
+The POC is a starting point for integrating data quality metrics into Datahub, it has shown that it is possible to run DBT tests and surface the results in the catalogue.
+
+### Challenges with the existing approach
+Whilst the POC has shown that it is possible to run DBT tests and surface the results in Datahub, there are some challenges with the existing approach:
+
+* The current approach requires tests to be defined in each individual DBT model, which can be time consuming for data engineers to implement.
+* Different teams are responsible for different models, which would create alot of overhead in terms of coordination and consistency.
+* The data quality tests may not be implemented consistently across all models, leading to gaps in data quality coverage.
+* There is no centralised way to manage and monitor data quality tests across all models, making it difficult to track progress and identify issues.
+
+### Proposed Approach
+Jacob HP has proposed a potential alternative approach to generating data quality metrics, that aims to address these challenges.
+
+This approach involves creating our own dbt project within CaDeT, containing a standard set of data quality tests that we can define and control. 
+We would then create a custom workflow that imports existing CaDeT DBT projects, that would run `dbt test` for all models in the project, and generate a single `run_results.json` file containing the results of all tests.
+
+This would allow us to:
+
+* Define a standard set of data quality tests that can be applied across all models.
+* Centralise the management and monitoring of data quality tests.
+* Reduce the overhead of coordinating with different teams, as the tests would be defined in a single project.
+* Ensure consistency in data quality coverage across all models.
