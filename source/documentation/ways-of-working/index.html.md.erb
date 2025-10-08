@@ -1,7 +1,7 @@
 ---
 owner_slack: "#find-moj-data"
 title: Ways of working
-last_reviewed_on: 2025-06-19
+last_reviewed_on: 2025-10-08
 review_in: 6 months
 ---
 
@@ -25,40 +25,46 @@ removing blockers and ensuring timelines are met.
 
 ## Communication and Delivery
 
-- **Daily [Stand-ups](#stand-up):** A quick get-together to share progress updates.
+- **[Stand-ups](#stand-up):** A quick get-together to share progress updates.
 - **Ceremonies:** How we make sure our team stays aligned as we work to deliver during Agile Sprints.
+
+## Continuous Improvement
+
+- Actively seek feedback from all team members and stakeholders
+- Review and update our Ways of Working as necessary to reflect our evolving process and learnings
 
 ## Ceremonies
 
 ### Schedule
 
-This team uses **Fortnightly Sprints**. This is our timeframe for planning, executing, and reviewing work.
+This team uses **three week sprints**. This is our timeframe for planning, executing, and reviewing work. Note that standups are only on Wednesday, Thursday and Friday.
 
 The team has the following ceremonies:
 
-| Ceremony                                                | Occurence   | Day             | Time          |
-| ------------------------------------------------------- | ----------- | --------------- | ------------- |
-| [Stand Up](#stand-up)                                   | Daily       | Monday - Friday | 10:45 - 11:00 |
-| [Show & Tell](#show-and-tell)                           | Fortnightly | Monday          | 15:00 - 15:30 |
-<!--| [Roadmap Monthly Review](#roadmap-review)               | Fortnightly | Monday          | 15:30 - 16:15 |-->
-| [Backlog refinement](#backlog-refinement)                             | Fortnightly | Monday          | 11:00 - 12:00 |
-<!--| [Refinement 2](#refinement)                             | Fortnightly | Thursday        | 12:00 - 12:45 |-->
-| [Sprint Retrospective](#sprint-retrospective)           | Fortnightly | Thursday        | 11:00 - 12:00 |
-| [Sprint Planning](#sprint-planning)                     | Fortnightly | Thursday        | 13:00 - 14:00 |
+| Ceremony                                                | Occurence         | Day                | Time          |
+| ------------------------------------------------------- | ----------------- | ------------------ | ------------- |
+| [Stand up](#stand-up)                                   | Daily             | Wednesday - Friday | 10:45 - 11:00 |
+| [Sprint review](#sprint-review)                         | Weekly            | Tuesday            | 10:30 - 11:00 |
+| [Discuss the thing](#discuss-the-thing)                 | Weekly (optional) | Tuesday            | 15:00 - 15:45 |
+| [Sprint planning](#sprint-planning)                     | Every 3 weeks     | Tuesday            | 13:00 - 14:00 |
+| [Show & tell](#show-and-tell)                           | Fortnightly       | Thursday           | tbd           |
+| [Sprint retrospective](#sprint-retrospective)           | Every 3 weeks     | Thursday           | 11:00 - 12:00 |
+| [Social stand up](#social-stand-up)                     | Weekly            | Monday             | 10:30 - 11:00 |
 
-We also have an architecture and high-level design meeting on the first Wednesday of each month at 14:00. 
+We also have an architecture and high-level design meeting on the first Wednesday of each month at 14:00.
 
-### Stand Up
+### Stand up
 
 Our stand-ups run daily at 10:45 and last for fifteen minutes.
+
 We use Microsoft Teams and follow one of two formats:
 
-- **Walk The Board**
+- **Walk the board**
 
   - Starting with the “Done” column we discuss any active issues on our
   [GitHub Project Board](https://github.com/orgs/ministryofjustice/projects/57/views/5).
 
-- **Yesterday, Today, Blocked**
+- **Yesterday, today, blocked**
 
   - A round robin of each team member discussing their issues and any blockers.
 
@@ -66,26 +72,73 @@ Standup is run by either the PM, DM, or whoever wants to run it.
 
 Ad-hoc discussions may spin out from stand-up. These should take place after the meeting ends if time allows, or should be arranged for the next available time.
 
-### Show and Tell
+### Sprint review
 
-- Near the beginning of each sprint we have a thirty-minute show and tell showcase that provides an opportunity to share our progress from the previous sprint with the wider organisation.
-- In this session we show new features developed for the catalogue, outputs of user research and service design, technical decisions and challenges, among other things.
-- Once the content for the session has been agreed, publicise it in the [#data-platform-services](https://moj.enterprise.slack.com/archives/C04BBJR3RPB), [#ask-data-catalogue](https://moj.enterprise.slack.com/archives/C06NPM2200N) and [#platform-architecture](https://moj.enterprise.slack.com/archives/CFE5ZQAQ7) Slack channels.
-- This session should be recorded so that it can be shared with stakeholders.
+Ticket by ticket inspection on the current sprint.
+
+### Discuss the thing
+
+#### Purpose
+
+This is an optional meeting for member of the Find MOJ Data team to discuss a relevant item, gather opinions or playback something they have been working on recently.
+
+#### Typical examples
+
+- Sharing a research insight
+- Gathering thought on design mock ups
+- Sharing New ways of working
+  - Talking through a technical change or new software feature
+  - Showcasing a general piece of work you have done during the sprint.
+
+If you have an item to discuss please add to the schedule, if there are no items for discussion we will remove from the Calendar.
+
+### Show and tell
+
+In this session we show new features developed for the catalogue, outputs of user research and service design, technical decisions and challenges, among other things.
+
+The sessions are shared with Analytical Platform so that we can share knowledge and provide a consistent offer.
 
 #### Audience
 
-The team, stakeholders, and anyone interested in the catalogue
+Currently only an internal team audience.
 
-### Roadmap Review
+### Sprint planning
 
-- The roadmap review is a monthly session where the team, stakeholders and users reflect on and amend the [product roadmap (hosted on Miro)](https://miro.com/app/board/uXjVNPsG_-I=/?moveToWidget=3458764573518671543&cot=14).
-- This is an opportunity for stakeholders to share business context which may affect the order in which we do things.
+#### Purpose
 
-#### Audience
+Sprint Planning is where we figure out what work we want to commit to for the next sprint. It's where we:
 
-All of the Data Improvement Programme and any wider audience
+- Discuss and align on the goals for the upcoming sprint
+- Select stories from the refined backlog, ensuring a shared understanding of scope and objectives
+- Define the sprint goal
+- Define the sprint backlog
 
+#### Process
+
+- **Discussion:** Discuss the stories in the refined backlog, ensuring a shared understanding of scope and objectives, including any work carried from last sprint
+- **Highlighting:** Highlight stories and spikes that are significant to delivery of the sprint goal
+- **Capacity Estimation:** Estimate the capacity of the team for the sprint, and assess whether the tickets brought in match that
+- **Sprint Backlog:** Select the stories that will be brought into the sprint, and assign them to team members where appropriate
+
+#### Output
+
+- Ensure everyone has stories that they feel they can work on
+- Ensure everyone has a shared understanding of the tasks to deliver this sprint
+
+### Sprint retrospective
+
+At the end of the sprint, we:
+
+- Reflect on the sprint’s process, celebrating successes and identifying opportunities for improvement
+- Review the process, not the stories
+- Define how we could improve
+- Share kudos (praise) and feedback
+  
+### Social stand up
+
+Free time for a chat around non-work related stuff.
+
+<!--
 ### Backlog refinement
 
 **Purpose:**
@@ -141,51 +194,17 @@ All tickets that go through refinement should have all the info required for any
 
 Data Catalogue Team
 
-### Sprint Retrospective
+### Roadmap Review
 
-At the end of the sprint, we:
+- The roadmap review is a monthly session where the team, stakeholders and users reflect on and amend the [product roadmap (hosted on Miro)](https://miro.com/app/board/uXjVNPsG_-I=/?moveToWidget=3458764573518671543&cot=14).
+- This is an opportunity for stakeholders to share business context which may affect the order in which we do things.
 
-- Reflect on the sprint’s process, celebrating successes and identifying opportunities for improvement
-- Review the process, not the stories
-- Define how we could improve
-- Share kudos and feedback
+#### Audience
+
+All of the Data Improvement Programme and any wider audience
+
 
 #### Audience
 
 Data Catalogue Team
-
-### Sprint Planning
-
-**Purpose:**
-
-Sprint Planning is where we figure out what work we want to commit to for the next sprint. It's where we:
-
-- Discuss and align on the goals for the upcoming sprint
-- Select stories from the refined backlog, ensuring a shared understanding of scope and objectives
-- Define the sprint goal
-- Define the sprint backlog
-
-**Process:**
-
-- **Discussion:** Discuss the stories in the refined backlog, ensuring a shared understanding of scope and objectives, including any work carried from last sprint
-- **Highlighting:** Highlight stories and spikes that are significant to delivery of the sprint goal
-- **Capacity Estimation:** Estimate the capacity of the team for the sprint, and assess whether the tickets brought in match that
-- **Sprint Backlog:** Select the stories that will be brought into the sprint, and assign them to team members where appropriate
-
-**Output:**
-
-- Ensure everyone has stories that they feel they can work on
-- Ensure everyone has a shared understanding of the tasks to deliver this sprint
-
-#### Audience
-
-Data Catalogue Team
-
-## GitHub Practices
-
-Detailed in the [Contributing](/documentation/ways-of-working/contributing.html) docs.
-
-## Continuous Improvement
-
-- Actively seek feedback from all team members and stakeholders
-- Review and update our Ways of Working as necessary to reflect our evolving process and learnings
+-->
