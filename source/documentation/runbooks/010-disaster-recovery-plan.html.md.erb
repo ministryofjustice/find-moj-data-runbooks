@@ -1,7 +1,7 @@
 ---
 owner_slack: "#find-moj-data"
 title: "Disaster recovery plans: Find MoJ Data"
-last_reviewed_on: 2025-04-23
+last_reviewed_on: 2025-10-23
 review_in: 6 months
 ---
 
@@ -146,6 +146,8 @@ helm rollback datahub [release] -n [NAMESPACE]
 The Azure EntraID tenant is not managed by this team, and any significant outage would cause much wider disruption than just to the Data Catalogue. The only course of action in this event would be to monitor communications on the issue.
 
 The more likely scenario - which is in scope for this team - is that the API keys/secrets which the applications use to communicate with the EntraID tenant expire or are deleted. In this event, follow the guidance in the [secrets management runbook](/documentation/runbooks/014-secrets-management.html).
+
+There is more information in the [Entra ID runbook](./019-entra-id.html).
 
 ### Database recovery
 
