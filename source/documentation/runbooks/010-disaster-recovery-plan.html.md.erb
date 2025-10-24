@@ -147,6 +147,8 @@ The Azure EntraID tenant is not managed by this team, and any significant outage
 
 The more likely scenario - which is in scope for this team - is that the API keys/secrets which the applications use to communicate with the EntraID tenant expire or are deleted. In this event, follow the guidance in the [secrets management runbook](/documentation/runbooks/014-secrets-management.html).
 
+There is more information in the [Entra ID runbook](./019-entra-id.html).
+
 ### Database recovery
 
 In many cases, restoring metadata by re-running the ingestion process will be faster than an RDS restore. At the time of writing, the ingestion takes around one hour to run, and RDS restoration requires PR approval from the Cloud Platform team and could take around two hours.
