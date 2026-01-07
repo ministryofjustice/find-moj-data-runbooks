@@ -1,0 +1,286 @@
+---
+owner_slack: "#find-moj-data"
+title: House Keeping
+last_reviewed_on: 2025-10-24
+review_in: 6 months
+---
+
+# <%= current_page.data.title %>
+## Datahub
+### dataProcessInstance cleanup
+Datahub creates a `dataProcessInstance` entity for each ingestion run. These entities are not automatically deleted after the ingestion is complete, which can lead to a large number of these entities accumulating over time.
+Approximately 60,000 `dataProcessInstance` entities are created per ingestion run. Over time, this can lead to performance degradation and increased storage usage in the Datahub instance.
+
+There is a garbage collection [process](https://github.com/ministryofjustice/data-catalogue/blob/main/ingestion/datahub-cleanup.yaml) to cleanup `dataProcessInstance` entities amongst others however despite being enabled, it does not appear to be functioning as expected in our environment.
+As a result I have been periodically pruning old `dataProcessInstance` entities manually using the steps below.
+
+This task should be carried out during a maintenance window or during off-peak hours, as it may impact database performance, every couple of months.
+It should be repeated across all ebvironments where Datahub is deployed (e.g. production, preprod, development).
+
+1) Obtain & decode the RDS endpoints and credentials for the relevant environment (e.g. production) via kubectl.
+
+```
+kubectl get secret -n data-platform-datahub-catalogue-prod rds-postgresql-instance-output -o json | jq '.data | map_values(@base64d)'
+```
+
+2) Launch the port forward pod in the appropriate environment (e.g. production) by specifiying the namespace `-n data-platform-datahub-catalogue-prod` and replacing `<rds_instance_address from above>` with the RDS instance address obtained in step 1:
+
+```bash
+   kubectl \
+    -n data-platform-datahub-catalogue-prod \
+    run port-forward-pod \
+    --image=ministryofjustice/port-forward \
+    --port=5432 \
+    --env="REMOTE_HOST=<rds_instance_address from above>" \
+    --env="LOCAL_PORT=5432" \
+    --env="REMOTE_PORT=5432"
+```
+3) Port forward the local port to the pod:
+
+```bash
+    kubectl -n data-platform-datahub-catalogue-prod \
+    port-forward \
+    port-forward-pod 1234:5432
+```
+
+4) Connect to the database using `psql`:
+
+```bash
+    psql postgresql://<username>:<password>@localhost:1234/<database_name>
+```
+5) Validate the number of `dataProcessInstance` entities present grouped by date:
+
+```sql
+    SELECT  DATE_TRUNC('day', createdon) AS day, COUNT(*) AS event_count 
+    FROM public.metadata_aspect_v2 
+    WHERE urn like 'urn:li:dataProcessInstance%' GROUP BY day ORDER BY day;
+```
+
+6) Example output:
+
+```
+db2182d9f2ebfb645b=> SELECT  DATE_TRUNC('day', createdon) AS day, COUNT(*) AS event_count
+FROM public.metadata_aspect_v2
+WHERE urn like 'urn:li:dataProcessInstance%' GROUP BY day ORDER BY day;
+         day         | event_count
+---------------------+-------------
+ 2025-11-03 00:00:00 |        6384
+ 2025-11-04 00:00:00 |        3686
+ 2025-11-05 00:00:00 |        4038
+ 2025-11-06 00:00:00 |        3686
+ 2025-11-07 00:00:00 |       68529
+ 2025-11-10 00:00:00 |       77815
+ 2025-11-11 00:00:00 |       66573
+ 2025-11-12 00:00:00 |       72944
+ 2025-11-13 00:00:00 |       63479
+ 2025-11-14 00:00:00 |       65498
+ 2025-11-17 00:00:00 |       69269
+ 2025-11-18 00:00:00 |       68473
+ 2025-11-19 00:00:00 |       75186
+ 2025-11-20 00:00:00 |       55133
+ 2025-11-21 00:00:00 |       77601
+ 2025-11-24 00:00:00 |       68353
+ 2025-11-25 00:00:00 |       69553
+ 2025-11-26 00:00:00 |       68125
+ 2025-11-27 00:00:00 |       72161
+ 2025-11-28 00:00:00 |       74241
+ 2025-12-01 00:00:00 |       56933
+ 2025-12-02 00:00:00 |       95288
+ 2025-12-03 00:00:00 |       95531
+ 2025-12-04 00:00:00 |       60142
+ 2025-12-05 00:00:00 |       82654
+ 2025-12-08 00:00:00 |       69524
+ 2025-12-09 00:00:00 |       78643
+ 2025-12-10 00:00:00 |       84827
+ ```
+
+7) Delete `dataProcessInstance` entities older than a specific date (e.g. 2025-11-10). Usually I retain approximately one to two months of data:
+
+BE VERY CAREFUL WITH THIS COMMAND. Ensure that you have the syntax and correct date format before running it. You have been warned!:
+
+```sql
+DELETE FROM public.metadata_aspect_v2 WHERE urn like 'urn:li:dataProcessInstance%' AND createdon::date < '2025-11-10';
+```
+Example output:
+
+```
+db2182d9f2ebfb645b=> DELETE FROM public.metadata_aspect_v2 WHERE urn like 'urn:li:dataProcessInstance%' AND createdon::date < '2025-11-10';
+
+DELETE 86323
+```
+
+8) Re-run the validation query from step 5 to confirm the deletion:
+
+```sql
+    SELECT  DATE_TRUNC('day', createdon) AS day, COUNT(*) AS event_count 
+    FROM public.metadata_aspect_v2 
+    WHERE urn like 'urn:li:dataProcessInstance%' GROUP BY day ORDER BY day;
+```
+9) Example output after deletion:
+
+```
+db2182d9f2ebfb645b=> SELECT  DATE_TRUNC('day', createdon) AS day, COUNT(*) AS event_count
+    FROM public.metadata_aspect_v2
+    WHERE urn like 'urn:li:dataProcessInstance%' GROUP BY day ORDER BY day;
+         day         | event_count
+---------------------+-------------
+ 2025-11-10 00:00:00 |       77815
+ 2025-11-11 00:00:00 |       66573
+ 2025-11-12 00:00:00 |       72944
+ 2025-11-13 00:00:00 |       63479
+ 2025-11-14 00:00:00 |       65498
+ 2025-11-17 00:00:00 |       69269
+ 2025-11-18 00:00:00 |       68473
+ 2025-11-19 00:00:00 |       75186
+ 2025-11-20 00:00:00 |       55133
+ 2025-11-21 00:00:00 |       77601
+ 2025-11-24 00:00:00 |       68353
+ 2025-11-25 00:00:00 |       69553
+ 2025-11-26 00:00:00 |       68125
+ 2025-11-27 00:00:00 |       72161
+ 2025-11-28 00:00:00 |       74241
+ 2025-12-01 00:00:00 |       56933
+ 2025-12-02 00:00:00 |       95288
+ 2025-12-03 00:00:00 |       95531
+ 2025-12-04 00:00:00 |       60142
+ 2025-12-05 00:00:00 |       82654
+ 2025-12-08 00:00:00 |       69524
+ 2025-12-09 00:00:00 |       78643
+ 2025-12-10 00:00:00 |       84827
+(23 rows)
+```
+
+10) Run a vacuum to reclaim storage space:
+
+CAUTION: This operation can be resource-intensive and may impact database performance. It is advisable to perform this during off-peak hours.
+
+```sql
+    db2182d9f2ebfb645b=> VACUUM FULL public.metadata_aspect_v2;
+```
+
+11) Once complete, exit the `psql` session and terminate the port-forward pod:
+
+```bash
+    kubectl -n data-platform-datahub-catalogue-prod delete pod port-forward-pod
+```
+
+## Find MoJ Data
+### Login session cleanup
+The Find MoJ Data application creates login sessions for users when they authenticate. These sessions are stored in the database and are not automatically deleted after a certain period of time, which can lead to a
+large number of these sessions accumulating over time.
+
+1) Obtain & decode the RDS endpoints and credentials for the relevant environment (e.g. production) via kubectl.
+
+```
+kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-output -o json | jq '.data | map_values(@base64d)'
+```
+
+2) Launch the port forward pod in the appropriate environment (e.g. production) by specifiying the namespace `-n data-platform-find-moj-data-prod` and replacing `<rds_instance_address from above>` with the RDS instance address obtained in step 1:
+
+```bash
+   kubectl \
+    -n data-platform-find-moj-data-prod \
+    run port-forward-pod \
+    --image=ministryofjustice/port-forward \
+    --port=5432 \
+    --env="REMOTE_HOST=<rds_instance_address from above>" \
+    --env="LOCAL_PORT=5432" \
+    --env="REMOTE_PORT=5432"
+```
+3) Port forward the local port to the pod:
+
+```bash
+    kubectl -n data-platform-find-moj-data-prod \
+    port-forward \
+    port-forward-pod 1234:5432
+```
+4) Connect to the database using `psql`:
+
+```bash
+    psql postgresql://<username>:<password>@localhost:1234/<database_name>
+```
+
+5) Display the tables present in the database:
+
+```sql
+    \dt
+```
+
+example output:
+
+```
+db3a14acc6ad1a9fb6=> \dt
+                        List of relations
+ Schema |               Name                | Type  |   Owner
+--------+-----------------------------------+-------+------------
+ public | auth_group                        | table | cpVy6xNtU9
+ public | auth_group_permissions            | table | cpVy6xNtU9
+ public | auth_permission                   | table | cpVy6xNtU9
+ public | django_admin_log                  | table | cpVy6xNtU9
+ public | django_content_type               | table | cpVy6xNtU9
+ public | django_migrations                 | table | cpVy6xNtU9
+ public | django_session                    | table | cpVy6xNtU9
+ public | feedback_feedbackno               | table | cpVy6xNtU9
+ public | feedback_feedbackreport           | table | cpVy6xNtU9
+ public | feedback_feedbackyes              | table | cpVy6xNtU9
+ public | feedback_issue                    | table | cpVy6xNtU9
+ public | users_customuser                  | table | cpVy6xNtU9
+ public | users_customuser_groups           | table | cpVy6xNtU9
+ public | users_customuser_user_permissions | table | cpVy6xNtU9
+ public | waffle_flag                       | table | cpVy6xNtU9
+ public | waffle_flag_groups                | table | cpVy6xNtU9
+ public | waffle_flag_users                 | table | cpVy6xNtU9
+ public | waffle_sample                     | table | cpVy6xNtU9
+ public | waffle_switch                     | table | cpVy6xNtU9
+(19 rows)
+```
+
+
+ 5) Validate the number of login sessions present before a cleanup :
+
+```sql
+   db3a14acc6ad1a9fb6=> select count(*) from django_session where expire_date::date < '2025-12-05';
+ count
+--------
+ 775502
+(1 row)
+```
+
+6) Delete login sessions with `expire_date` older than a specific date (e.g. 2025-12-05). Usually I retain approximately one month of data:
+
+```sql
+   DELETE FROM django_session WHERE expire_date::date < '2025-12-05';
+```
+
+Example output:
+
+```
+db3a14acc6ad1a9fb6=> DELETE FROM django_session WHERE expire_date::date < '2025-12-05';
+DELETE 775502
+```
+
+7) Re-run the validation query from step 5 to confirm the deletion:
+
+```sql
+   db3a14acc6ad1a9fb6=> select count(*) from django_session where expire_date::date < '2025-12-05';
+ count
+-------
+     0
+(1 row)
+ ```
+
+8) Run a vacuum to reclaim storage space:
+
+CAUTION: This operation can be resource-intensive and may impact database performance. It is advisable to perform this during off-peak hours.
+
+```sql
+    db3a14acc6ad1a9fb6=> VACUUM FULL django_session;
+```
+
+9) Once complete, exit the `psql` session and terminate the port-forward pod:
+
+```bash
+    kubectl -n data-platform-find-moj-data-prod delete pod port-forward-pod
+```
+
+
