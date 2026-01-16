@@ -1,40 +1,46 @@
 ---
 owner_slack: "#find-moj-data"
 title: Azure and Django User log retrival
-last_reviewed_on: 2025-10-24
+last_reviewed_on: 2026-01-09
 review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
-## Azure/Entranet
-### Logging in and Enabling role
+## Azure/Entrant
+### Log in and Enable activate reader role
+
 We use Entranet Login to secure the Find MoJ website so we can use these logs to get an idea of how many people have logged in to the platofrm.Entranet
 
-First you need to log into https://entra.microsoft.com/
+1) First you need to log into [Entranet](https://entra.microsoft.com/)
 
-search for “PIM” you should see this in the results:
-Image
+[This diagram](../../images/microsoft-entra-admin-center.png)
 
-Then you can browse to My Roles, and Activate Reports Reader.
+2) search for “Privileged Identity Management” you should see this in the results:
 
+[This diagram](../../images/pim.png)
 
-Search for enterprise applications
-
-Use search by application name and look for find-moj-data-prod
-
-click on the link and then click on sign in logs
+3) Then you can browse to My Roles, and Activate Reports Reader.
 
 
-change the filters so date range is last 1 month and click apply
-
-once the results are displayed click Download csv
+4) Search for enterprise applications
 
 
-<image>
+5) Use search by application name and look for find-moj-data-prod
+
+[This diagram](../../images/repo-strategy-workflow.excalidraw.png)
+
+6) click on the link and then click on sign in logs
 
 
-Download interactive signins and non interactive signins
+7) change the filters so date range is last 1 month and click apply
 
+[This diagram](../../images/date-range.png)
+
+8) Click Download and select csv
+
+[This diagram](../../images/logs-download.png)
+
+9) Download interactive signins and non interactive signins
 
 
 
@@ -72,15 +78,14 @@ kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-o
 
 Create a connection to a server using the details from step 1
 
-<image>
+[This diagram](../../images/pgadmin4.png)
 
 
-5) Select the server youve just set up and choose databases > schemas > public > Tables
+5) Select the server you have just set up and choose databases > schemas > public > Tables
+[This diagram](../../images/pgadmin4-page.png)
 
 
-5)
-
-right click on users_customuser and select query tool
+5) right click on users_customuser and select query tool
 
 
 
@@ -91,7 +96,7 @@ select * from users_customuser;
 
 7) in the data output window click the download icon and name the file
 
-image
+
 
 
 
