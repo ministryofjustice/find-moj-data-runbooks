@@ -18,7 +18,7 @@ The upgrade process for DataHub is relatively straightforward as it is handled b
 1. Check the DataHub Helm releases [check for the latest release that's compatible with the destination version](https://github.com/acryldata/datahub-helm/blame/master/charts/datahub/Chart.yaml#L10)
 1. Check the [DataHub helm release changes from current deployed version to future version](https://github.com/acryldata/datahub-helm/compare/datahub-0.3.30...datahub-0.4.6)
 for any changes that need to be propagated to the helm chart values files
-(make sure to set the 'base' and 'compare' to the correct release values in this view)
+(make sure to set the 'base' and 'compare' to the correct release values in this view). You'll find the deployed helm version [here](https://github.com/ministryofjustice/data-catalogue/blob/main/.github/workflows/deploy-dev.yml#L17)
 1. Submit the upgrade release PR and send an 'alert' message to the [#data-catalogue-dev](https://moj.enterprise.slack.com/archives/C06UQ5HSR25) channel to let others know that DataHub may be disrupted
 1. Deploy to dev and test out the [DataHub interface](https://datahub-catalogue-dev.apps.live.cloud-platform.service.justice.gov.uk/),
 ensure that [Find MoJ Data dev](https://dev.find-moj-data.service.justice.gov.uk/)
