@@ -1,0 +1,58 @@
+---
+owner_slack: "#find-moj-data"
+title: Google Analytics Integrgration
+last_reviewed_on: 2025-10-27
+review_in: 6 months
+---
+
+# <%= current_page.data.title %>
+
+Google Analytics is used to help us track the usage of the Find MoJ platform. Google Tag Manager is used to create triggers for specific Events on the website
+
+
+## What needs tracking
+
+- Search Terms
+- CSV Downloads
+- Page Views
+- Feedback button clicks
+
+## What tags are set up in GTM
+
+- Download csv - click text contains "descriptions (CSV Format)"
+- feedback_click_no - Click event contains "feedback-no-button"
+- feedback_click_yes - Click event contains "feedback-yes-button"
+- feedback_click_report - Click event contains "feedback-report-button"
+
+
+## Analytics Exploration reports created
+
+### Search
+Search contains 3 explorations
+
+1. Search Results. Contains all page Path and Query strings that start with /search
+2. Search with Query. Contains search where a query has been entered
+3. Pagination. Contains All search pages where pagination has occurred
+
+
+### Feedback Results
+
+Contains 3 explorations. This uses the feedback_click tags from GTM
+
+1. No Clicks - Contains page patch and query string for no clicks
+2. Yes Clicks - Contains page patch and query string for yes clicks
+3. Report Clicks - Contains page patch and query string for Report clicks
+
+
+### Page Views
+
+contains 2 explorations
+
+1. Details Page views - Results of page views that start with /details/  This gives us information on what data pages people are viewing
+2. All Pages views - Contains all pages views for all parts of the website
+
+
+### CSV Downloads
+
+Single exploration using the Download_csv tag from gtm This gives the page title for every csv downloaded
+
