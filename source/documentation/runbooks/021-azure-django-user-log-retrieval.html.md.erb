@@ -77,33 +77,29 @@ kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-o
 
 Create a connection to a server using the details from step 1
 
-[This diagram](../../images/pgadmin4.png)
-
+![This diagram](../../images/pgadmin4.png)
 
 5) Select the server you have just set up and choose databases > schemas > public > Tables
-[This diagram](../../images/pgadmin4-page.png)
+
+![This diagram](../../images/pgadmin-page.png)
 
 
-5) right click on users_customuser and select query tool
+6) Right click on users_customuser and select query tool
 
 
+7) In the query window which opens type
 
-6)  In the query window which opens type
-
-select * from users_customuser;
-
-
-7) in the data output window click the download icon and name the file
-
-
-
-
-
-
-8) Once complete, exit the `psql` session and terminate the port-forward pod:
-
-```bash
-    kubectl -n data-platform-find-moj-data-prod delete pod port-forward-pod
+```
+SELECT * from users_customuser;
 ```
 
-9) Send the 3 csv files over to the relevant people for analysis (currently lesley-Ann)
+8) In the data output window click the download icon and name the file
+
+
+9) Once complete, exit the `psql` session and terminate the port-forward pod:
+
+```bash
+kubectl -n data-platform-find-moj-data-prod delete pod port-forward-pod
+```
+
+10) Send the 3 csv files over to the relevant people for analysis (currently lesley-Ann)
