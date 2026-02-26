@@ -5,61 +5,6 @@ title: Incident reports
 
 # <%= current_page.data.title %>
 
-## Data loss - 22nd April 2025
+- [22nd April 2025 - data loss](./2025-04-22--data-loss.html.md.erb)
+- [24th February 2026 - search failure](./2026-02-24--search-failure.html)
 
-On the morning of Tuesday 22nd April 2025, it became apparent there was an issue with the service (at this time, the service was still in public beta).
-
-### Timeline
-
-- 09:00 - incident identified
-- 09:14 - incident message posted in #data-catalogue
-- 09:20 - recovery options discussed
-- 09:50 - RDS snapshot restoration commenced:
-  - 10:05 - Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32323) raised and posted in [ask-cloud-platform](https://mojdt.slack.com/archives/C57UPMZLY/p1745312725075239)
-  - 10:27 - after a Concourse build failure, a subsequent Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32325) raised to remove RDS deletion protection
-  - 11:15 - further Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32332) to add the RDS snapshot ID for restore
-- 11:35 - service fully restored; service restored message posted in #ask-data-catalogue and #data-catalogue
-- 12:22 final Cloud Platform [PR](https://github.com/ministryofjustice/cloud-platform-environments/pull/32337) to switch DB protection back on, and remove snapshot ID
-- 2025-04-23 - post-incident review conducted and circulated
-
-While the service was most likely down over the long Easter weekend, the service was restored in around 2.5 hours from us first becoming aware of the issue.
-
-### Symptoms
-
-- Multiple Sentry alerts: `FIND-MOJ-DATA-D9 - CatalogueError: Unable to execute list domains query`
-- DataHub user accounts had been reset to lowest-priviledge defaults (this was when we noticed that 1Password was missing the admin credentials)
-- User reporting the issue in #ask-data-catalogue
-- The home page displaying the "there is a problem with the service" page
-- The DataHub home page was displaying the URNs of domains, not their names
-- All DataHub assets were missing (datasets, domains, glossary etc). Note that DataHub still displayed a **count** of datasets
-- Ingestions failing from the following day as a result of tokens no longer being present in the database
-
-### Options considered
-
-- Manual restoration of user accounts
-  - Before it became clear what the problem was, we considered manually updating the DataHub database to restore admin permissions back to our accounts. We discounted this when it became clear that the scope of the problem was wider than data domains and user permissions
-- Restoring an RDS snapshot
-  - Since use role assignments were affected (not just data assets), and were reasonably sure that the previous Thursdays' snapshot was good, we quickly decided that a restoration of the DataHub database was the quickest route to restoring the service
-
-### Cause
-
-Since RDS low storage has been a constant worry for the team, a manually executed database cleanup script was run on Thursday 17th April ahead of the 4-day Easter weekend. The script has been run several times before by the team, but does require manually updating before executing.
-
-It appears that a bug in this script was responsible for removing more data than intended - the intent was to remove only older `dataProcessInstance` records - "log" entries related to removing data. But since DataHub stores everything in one table, any slight bug in the script will have wider consequences, removing more data than was intended.
-
-### Lessons learned
-
-| Lesson   | Action   |
-|----------|----------|
-| We should have posted an ongoing incident message in #ask-data-catalogue | Added clear and simple list of "steps to take" to the top of the disaster recovery runbook |
-| We no longer need manual database cleanup | Priortise the ticket to implement DataHub 1.0.0's new native cleanup |
-| RDS restoration could be more efficient | Update our runbooks to set out steps, rather than just relying on Cloud Platform docs and ask channel |
-| DataHub admin password missing from the team 1Password vault | Admin credentials added to shared vault |
-
-### Other conclusions
-
-Restoring the service within 2.5 hours was well within our stated aims, and we have identified improvements to the database restore process which would potentially reduce this to two hours.
-
-As part of this review, we re-visited our assumption in our disaster recovery guidance that re-ingesting all metadata is still the preferred option over restoring the database (as we did in this case). Given that the ingestion process currently takes around **one** hour, we still feel that in **some** cases this is still the correct advice.
-
-In this case, where DataHub user account settings are also affected, an database restore is the best option. The disaster recovery runbook page has been updated to make this distinction.
