@@ -7,26 +7,26 @@ review_in: 6 months
 
 # <%= current_page.data.title %>
 
-Datahub uses Elasticsearch as its search engine. It is possible to [customise search ranking, filtering, and queries using a configuration file](https://datahubproject.io/docs/how/search/#customizing-search) but for the time being we are using the default configuration.
+Datahub uses ElasticSearch as its search engine. It is possible to [customise search ranking, filtering, and queries using a configuration file](https://datahubproject.io/docs/how/search/#customizing-search) but for the time being we are using the default configuration.
 
-Fields are indexed by elasticsearch based on how Datahub's metadata model is configured;
-all fields that are marked with a “Searchable” annotation will be included in the elasticsearch mapping.
+Fields are indexed by ElasticSearch based on how Datahub's metadata model is configured;
+all fields that are marked with a “Searchable” annotation will be included in the ElasticSearch mapping.
 
 To find out which fields are searchable, see the [.pdl files in metadata-models](https://github.com/datahub-project/datahub/tree/master/metadata-models/src/main/pegasus/com/linkedin) or view the `Searchable` tag in the [datahub demo instance](https://demo.datahubproject.io/dataset/urn:li:dataset:(urn:li:dataPlatform:datahub,Dataset,PROD)/Schema?is_lineage_mode=false&schemaFilter=).
 
-The Elasticsearch field names diverge from the GraphQL ones, which changes what you need to pass in for search filters. General conventions:
+The ElasticSearch field names diverge from the GraphQL ones, which changes what you need to pass in for search filters. General conventions:
 
 - don’t include the aspect (e.g. it’s `name` rather than `properties.name`)
 - collections are plural
 
-## How the GraphQL API translates queries into Elasticsearch queries
+## How the GraphQL API translates queries into ElasticSearch queries
 
 The GraphQL API has several queries for search. We are using [searchAcrossEntities](https://datahubproject.io/docs/graphql/queries#searchacrossentities) and [aggregateAcrossEntities](https://datahubproject.io/docs/graphql/queries#aggregateacrossentities).
 There are two kinds of query string we can pass in, a simple one and a structured one for advanced searches. We’re using the simple one.
 
-When you call one of these GraphQL queries, the GMS constructs a corresponding Elasticsearch query:
+When you call one of these GraphQL queries, the GMS constructs a corresponding ElasticSearch query:
 
-- For each field in the `SearchConfig`, SearchQueryBuilder generates [Elasticsearch should clauses](https://github.com/datahub-project/datahub/blob/dc16c73937dcb4a287653090faf3c32807257872/metadata-io/src/main/java/com/linkedin/metadata/search/elasticsearch/query/request/SearchQueryBuilder.java#L141)
+- For each field in the `SearchConfig`, SearchQueryBuilder generates [ElasticSearch should clauses](https://github.com/datahub-project/datahub/blob/dc16c73937dcb4a287653090faf3c32807257872/metadata-io/src/main/java/com/linkedin/metadata/search/elasticsearch/query/request/SearchQueryBuilder.java#L141)
 - [SearchQueryBuilder Applies score functions](https://github.com/datahub-project/datahub/blob/dc16c73937dcb4a287653090faf3c32807257872/metadata-io/src/main/java/com/linkedin/metadata/search/elasticsearch/query/request/SearchQueryBuilder.java#L106) to adjust the ranking of results
 - [SearchRequestHandler applies any filters](https://github.com/datahub-project/datahub/blob/dc16c73937dcb4a287653090faf3c32807257872/metadata-io/src/main/java/com/linkedin/metadata/search/elasticsearch/query/request/SearchRequestHandler.java#L188). By default, soft-deleted results are filtered out.
 
