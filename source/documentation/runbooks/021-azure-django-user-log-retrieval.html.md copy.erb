@@ -6,8 +6,10 @@ review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
+
 ## Azure/Entrant
-### Log in and Enable activate reader role
+
+### Log in and enable activate reader role
 
 We use Entranet Login to secure the Find MoJ website so we can use these logs to get an idea of how many people have logged in to the platofrm.Entranet
 
@@ -41,15 +43,14 @@ We use Entranet Login to secure the Find MoJ website so we can use these logs to
 
 9) Download interactive signins and non interactive signins
 
-
-
 ### Login session Download
+
 The Find MoJ Data application creates login sessions for users when they authenticate. These sessions are stored in the database and are not automatically deleted after a certain period of time, which can lead to a
 large number of these sessions accumulating over time.
 
 1) Obtain & decode the RDS endpoints and credentials for the relevant environment (e.g. production) via kubectl.
 
-```
+```bash
 kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-output -o json | jq '.data | map_values(@base64d)'
 ```
 
@@ -83,18 +84,15 @@ Create a connection to a server using the details from step 1
 
 ![This diagram](../../images/pgadmin-page.png)
 
-
 6) Right click on users_customuser and select query tool
-
 
 7) In the query window which opens type
 
-```
+```sql
 SELECT * from users_customuser;
 ```
 
 8) In the data output window click the download icon and name the file
-
 
 9) Once complete, exit the `psql` session and terminate the port-forward pod:
 
@@ -102,4 +100,4 @@ SELECT * from users_customuser;
 kubectl -n data-platform-find-moj-data-prod delete pod port-forward-pod
 ```
 
-10) Send the 3 csv files over to the relevant people for analysis (currently lesley-Ann)
+10) Send the 3 csv files over to the relevant people for analysis (currently Lesley-Ann)
