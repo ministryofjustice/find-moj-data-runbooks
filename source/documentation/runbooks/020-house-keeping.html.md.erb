@@ -6,16 +6,19 @@ review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
-## Datahub
+
+## DataHub
+
 ### dataProcessInstance cleanup
-Datahub creates a `dataProcessInstance` entity for each ingestion run. These entities are not automatically deleted after the ingestion is complete, which can lead to a large number of these entities accumulating over time.
-Approximately 60,000 `dataProcessInstance` entities are created per ingestion run. Over time, this can lead to performance degradation and increased storage usage in the Datahub instance.
+
+DataHub creates a `dataProcessInstance` entity for each ingestion run. These entities are not automatically deleted after the ingestion is complete, which can lead to a large number of these entities accumulating over time.
+Approximately 60,000 `dataProcessInstance` entities are created per ingestion run. Over time, this can lead to performance degradation and increased storage usage in the DataHub instance.
 
 There is a garbage collection [process](https://github.com/ministryofjustice/data-catalogue/blob/main/ingestion/datahub-cleanup.yaml) to cleanup `dataProcessInstance` entities amongst others however despite being enabled, it does not appear to be functioning as expected in our environment.
 As a result I have been periodically pruning old `dataProcessInstance` entities manually using the steps below.
 
 This task should be carried out during a maintenance window or during off-peak hours, as it may impact database performance, every couple of months.
-It should be repeated across all ebvironments where Datahub is deployed (e.g. production, preprod, development).
+It should be repeated across all ebvironments where DataHub is deployed (e.g. production, preprod, development).
 
 1) Obtain & decode the RDS endpoints and credentials for the relevant environment (e.g. production) via kubectl.
 
@@ -58,10 +61,13 @@ kubectl get secret -n data-platform-datahub-catalogue-prod rds-postgresql-instan
 
 6) Example output:
 
-```
+```sql
 db2182d9f2ebfb645b=> SELECT  DATE_TRUNC('day', createdon) AS day, COUNT(*) AS event_count
 FROM public.metadata_aspect_v2
 WHERE urn like 'urn:li:dataProcessInstance%' GROUP BY day ORDER BY day;
+```
+
+```
          day         | event_count
 ---------------------+-------------
  2025-11-03 00:00:00 |        6384
@@ -101,9 +107,10 @@ BE VERY CAREFUL WITH THIS COMMAND. Ensure that you have the syntax and correct d
 ```sql
 DELETE FROM public.metadata_aspect_v2 WHERE urn like 'urn:li:dataProcessInstance%' AND createdon::date < '2025-11-10';
 ```
+
 Example output:
 
-```
+```sql
 db2182d9f2ebfb645b=> DELETE FROM public.metadata_aspect_v2 WHERE urn like 'urn:li:dataProcessInstance%' AND createdon::date < '2025-11-10';
 
 DELETE 86323
@@ -118,11 +125,14 @@ DELETE 86323
 ```
 9) Example output after deletion:
 
-```
+```sql
 db2182d9f2ebfb645b=> SELECT  DATE_TRUNC('day', createdon) AS day, COUNT(*) AS event_count
     FROM public.metadata_aspect_v2
     WHERE urn like 'urn:li:dataProcessInstance%' GROUP BY day ORDER BY day;
-         day         | event_count
+```
+
+```
+day | event_count
 ---------------------+-------------
  2025-11-10 00:00:00 |       77815
  2025-11-11 00:00:00 |       66573
@@ -165,20 +175,22 @@ CAUTION: This operation can be resource-intensive and may impact database perfor
 ```
 
 ## Find MoJ Data
+
 ### Login session cleanup
+
 The Find MoJ Data application creates login sessions for users when they authenticate. These sessions are stored in the database and are not automatically deleted after a certain period of time, which can lead to a
 large number of these sessions accumulating over time.
 
 1) Obtain & decode the RDS endpoints and credentials for the relevant environment (e.g. production) via kubectl.
 
-```
+```bash
 kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-output -o json | jq '.data | map_values(@base64d)'
 ```
 
 2) Launch the port forward pod in the appropriate environment (e.g. production) by specifiying the namespace `-n data-platform-find-moj-data-prod` and replacing `<rds_instance_address from above>` with the RDS instance address obtained in step 1:
 
 ```bash
-   kubectl \
+kubectl \
     -n data-platform-find-moj-data-prod \
     run port-forward-pod \
     --image=ministryofjustice/port-forward \
@@ -187,10 +199,11 @@ kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-o
     --env="LOCAL_PORT=5432" \
     --env="REMOTE_PORT=5432"
 ```
+
 3) Port forward the local port to the pod:
 
 ```bash
-    kubectl -n data-platform-find-moj-data-prod \
+kubectl -n data-platform-find-moj-data-prod \
     port-forward \
     port-forward-pod 1234:5432
 ```
@@ -206,7 +219,7 @@ kubectl get secret -n data-platform-find-moj-data-prod rds-postgresql-instance-o
     \dt
 ```
 
-example output:
+Example output:
 
 ```
 db3a14acc6ad1a9fb6=> \dt
@@ -254,7 +267,7 @@ db3a14acc6ad1a9fb6=> \dt
 
 Example output:
 
-```
+```sql
 db3a14acc6ad1a9fb6=> DELETE FROM django_session WHERE expire_date::date < '2025-12-05';
 DELETE 775502
 ```
