@@ -1,7 +1,7 @@
 ---
 owner_slack: "#find-moj-data"
 title: House Keeping
-last_reviewed_on: 2025-10-24
+last_reviewed_on: 2026-05-27
 review_in: 6 months
 ---
 
@@ -15,7 +15,7 @@ There is a garbage collection [process](https://github.com/ministryofjustice/dat
 As a result I have been periodically pruning old `dataProcessInstance` entities manually using the steps below.
 
 This task should be carried out during a maintenance window or during off-peak hours, as it may impact database performance, every couple of months.
-It should be repeated across all ebvironments where Datahub is deployed (e.g. production, preprod, development).
+It should be repeated across all environments where Datahub is deployed (e.g. production, preprod, development).
 
 1) Obtain & decode the RDS endpoints and credentials for the relevant environment (e.g. production) via kubectl.
 
