@@ -1,38 +1,62 @@
 ---
 owner_slack: "#find-moj-data"
 title: Update DataHub version
-last_reviewed_on: 2025-11-13
+last_reviewed_on: 2026-11-13
 review_in: 6 months
 ---
 
 # <%= current_page.data.title %>
 
 There is no prescribed cadence for updates to DataHub, but new minor versions bumps are typically released every couple of months.
-Due to the rapid pace of feature development within the platform we aim to be close to the most recent release 
-(without unnecessary exposure to unintended breaking changes).
+Due to the rapid pace of feature development within the platform we aim to be close to the most recent release (without unnecessary exposure to unintended breaking changes).
 
-The upgrade process for DataHub is relatively straightforward as it is handled by a 
-[dedicated upgrade job](https://github.com/acryldata/datahub-helm/tree/master/charts/datahub/templates/datahub-upgrade):
+An upgrade has two parts, and both need doing:
 
-1. Check the [DataHub 'Updating DataHub' page for breaking changes](https://datahubproject.io/docs/how/updating-datahub#breaking-changes)
-1. Check the DataHub Helm releases [check for the latest release that's compatible with the destination version](https://github.com/acryldata/datahub-helm/blame/master/charts/datahub/Chart.yaml#L10)
-1. Check the [DataHub helm release changes from current deployed version to future version](https://github.com/acryldata/datahub-helm/compare/datahub-0.3.30...datahub-0.4.6)
-for any changes that need to be propagated to the helm chart values files
-(make sure to set the 'base' and 'compare' to the correct release values in this view)
-1. Submit the upgrade release PR and send an 'alert' message to the [#data-catalogue-dev](https://moj.enterprise.slack.com/archives/C06UQ5HSR25) channel to let others know that DataHub may be disrupted
-1. Deploy to dev and test out the [DataHub interface](https://datahub-catalogue-dev.apps.live.cloud-platform.service.justice.gov.uk/),
-ensure that [Find MoJ Data dev](https://dev.find-moj-data.service.justice.gov.uk/)
-continues to function ([run a test deployment](https://github.com/ministryofjustice/find-moj-data/actions/workflows/test-and-deploy.yml))
-    * Make sure to test out multiple pages of Find MoJ Data, as we've found that previously described changes not considered to be breaking have broken our front end.
-1. If there are issues with the upgrade and compatibility with Find MoJ Data, work with the team to determine the best course of action for upgrade, which may involve a temporary rollback.
-1. Once there are no issues with the upgrade, merge the PR and roll out the upgrade to higher environments.
+* **Server**: the DataHub Helm chart and image version, deployed from [data-catalogue](https://github.com/ministryofjustice/data-catalogue). Schema and index changes are handled by a [dedicated upgrade job](https://github.com/acryldata/datahub-helm/tree/master/charts/datahub/templates/datahub-upgrade).
+* **Client**: the `acryl-datahub` Python package used by our ingestion, and the managed ingestion CLI version. These should match the server version.
+
+## Before you start
+
+1. Check the [DataHub 'Updating DataHub' page for breaking changes](https://datahubproject.io/docs/how/updating-datahub#breaking-changes) in every release between the current version and the destination version.
+2. Check the DataHub Helm releases for the [latest chart release that's compatible with the destination version](https://github.com/acryldata/datahub-helm/blame/master/charts/datahub/Chart.yaml#L10). A new DataHub version may need a new chart version line.
+3. Compare the [DataHub Helm chart changes from the current version to the new version](https://github.com/acryldata/datahub-helm/compare/datahub-0.3.30...datahub-0.4.6) (set 'base' and 'compare' to the correct releases). Look for:
+    * new values that need adding to our values files
+    * changed defaults that need overriding to keep our current behaviour
+4. Check the steps in `.github/workflows/deploy-workflow.yml` marked "Remove this step once DataHub ships a fix upstream". If the new release fixes the issue, remove the step as part of the upgrade.
+
+## Upgrade dev
+
+Dev is upgraded first and runs ahead of preprod and prod until testing is complete.
+
+1. In `.github/workflows/deploy-dev.yml`, update `datahub_helm_version` (and `datahub_prereqs_helm_version` if needed).
+2. In `helm_deploy/dev/values-base.yaml`, set `global.datahub.version` and `global.datahub.managed_ingestion.defaultCliVersion` to the new versions.
+3. In `pyproject.toml`, update `acryl-datahub[dbt, glue, postgres]` to match the server version, run `uv lock`, and run the Python tests. Dependabot may already have raised this PR.
+4. Raise the upgrade PR and send an 'alert' message to the [#data-catalogue-dev](https://moj.enterprise.slack.com/archives/C06UQ5HSR25) channel to let others know that DataHub may be disrupted.
+
+You do not need to set a version in `helm_deploy/mae-consumer-timeseries-values.yaml`. It inherits the version from the environment values so it always matches GMS.
+
+## Test in dev
+
+1. Deploy to dev and test the [DataHub interface](https://datahub-catalogue-dev.apps.live.cloud-platform.service.justice.gov.uk/).
+2. Check that [Find MoJ Data dev](https://dev.find-moj-data.service.justice.gov.uk/) still works by [running a test deployment](https://github.com/ministryofjustice/find-moj-data/actions/workflows/test-and-deploy.yml).
+    * Test multiple pages of Find MoJ Data. Changes not described as breaking have broken our front end before.
+3. Run a full ingestion in dev, including CaDeT, and check it completes. New client versions can change how ingestion talks to GMS (see [Troubleshooting](#troubleshooting)).
+4. Run the post-ingestion checks workflow (`post-ingestion-checks.yml`).
+5. If there are issues with the upgrade, work with the team to decide the best course of action. This may involve a temporary rollback.
+
+## Upgrade preprod and prod
+
+Once there are no issues in dev:
+
+1. Move `global.datahub.version` and `defaultCliVersion` from `helm_deploy/dev/values-base.yaml` to `helm_deploy/values-base.yaml`.
+2. Update `datahub_helm_version` for both environments in `.github/workflows/deploy-staged.yml`.
+3. Merge the PR and roll out to preprod, then prod. Run an ingestion and check Find MoJ Data in each environment.
 
 ## Troubleshooting
 
 ### Another operation in progress
 
-If helm fails with `Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress`,
-you can run helm locally to rollback Datahub to an earlier revision, and then rerun the job.
+If helm fails with `Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress`, you can run helm locally to rollback Datahub to an earlier revision, and then rerun the job.
 
 To see the revision numbers:
 
@@ -57,4 +81,29 @@ Error: UPGRADE FAILED: release datahub failed, and has been rolled back due to a
 
 It means one of the jobs that run via pre-upgrade hooks failed. You should be able to see which one was running last from the github actions output. You can then use `k9s` to check the logs for that job.
 
-This error can be caused by a misconfigured ([or missing](https://github.com/datahub-project/datahub/issues/11655)) docker image tag.
+This error can be caused by:
+
+* a misconfigured ([or missing](https://github.com/datahub-project/datahub/issues/11655)) docker image tag
+* a changed chart default, for example chart 1.1.x enabled zero-downtime upgrades by default, so we set `global.datahub.systemUpdate.zdu.enable: false` in `helm_deploy/values-base.yaml`
+
+### Ingestion gets 403 errors
+
+The WAF (ModSecurity on `datahub-frontend`) is blocking a request the new client makes.
+
+For example, the 1.7 dbt source sends batches of dataset URNs to `/api/gms/openapi/v3/entity/dataset/batchGet`, and some URNs contain strings the WAF treats as attacks.
+
+To fix this, find the rule ID in the ingress logs and add a `SecRule REQUEST_URI ... ctl:ruleRemoveById=...` exclusion to the `datahub-frontend` ModSecurity snippet in `helm_deploy/values-base.yaml`, using the next free `id`. Keep the exclusion limited to the affected path.
+
+### Custom ingestion source fails
+
+Our custom sources extend DataHub classes, so a client upgrade (even a patch version) can remove or rename methods we override. This usually shows up as an `AttributeError` or failing tests.
+
+For example, 1.7.0.16 replaced `DBTCoreSource.loadManifestAndCatalog()` with `load_projects()`, so `ingestion/cadet_dbt_source/source.py` had to be updated.
+
+To fix this, compare the DataHub source code between the old and new versions and update our override.
+
+### CaDeT ingestion times out
+
+CaDeT ingestion can slow down after an upgrade. Increase `timeout-minutes` in `.github/workflows/ingest-cadet-metadata.yml` (it was raised from 240 to 360 for 1.7).
+
+The AWS role session (`role-duration-seconds`) can't be raised past the role's 4 hour maximum. This is fine, as AWS is only used at the start of the run.
